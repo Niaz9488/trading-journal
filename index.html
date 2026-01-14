@@ -1693,8 +1693,13 @@ function createResponse(success, message, data = null) {
         function checkLoginStatus() {
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showApp();
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showApp();
+                } catch (e) {
+                    localStorage.removeItem('currentUser');
+                    showLogin();
+                }
             } else {
                 showLogin();
             }
@@ -1714,19 +1719,28 @@ function createResponse(success, message, data = null) {
             updateUserInfo();
             updateConnectionStatus();
             updateDashboard();
+            loadUserTrades();
         }
 
         // User Management
         async function loginUser(email, password, name) {
             if (!SCRIPT_URL) {
                 showToast('Please configure Google Sheets connection first', 'error');
+                // Save credentials temporarily
+                localStorage.setItem('pendingEmail', email);
+                localStorage.setItem('pendingName', name);
+                localStorage.setItem('pendingPassword', password);
                 navigateToPage('settings');
                 return;
             }
 
             try {
+                showToast('Logging in...', 'warning');
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'login',
                         email: email,
@@ -1767,9 +1781,9 @@ function createResponse(success, message, data = null) {
                 const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
                 document.getElementById('userAvatarSmall').textContent = initials.slice(0, 2);
                 
-                // Check if user is admin (first user)
-                const savedUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-                if (savedUsers.length > 0 && savedUsers[0].email === currentUser.email) {
+                // Check if user is admin (first user or saved admin)
+                const adminEmail = localStorage.getItem('adminEmail');
+                if (currentUser.email === adminEmail) {
                     document.getElementById('adminControls').style.display = 'block';
                 }
             }
@@ -1781,6 +1795,25 @@ function createResponse(success, message, data = null) {
             if (savedUrl) {
                 document.getElementById('scriptUrl').value = savedUrl;
                 SCRIPT_URL = savedUrl;
+                updateConnectionStatus();
+            }
+            
+            // Check for pending login
+            const pendingEmail = localStorage.getItem('pendingEmail');
+            const pendingName = localStorage.getItem('pendingName');
+            const pendingPassword = localStorage.getItem('pendingPassword');
+            
+            if (pendingEmail && SCRIPT_URL) {
+                document.getElementById('userEmail').value = pendingEmail;
+                document.getElementById('userName').value = pendingName;
+                document.getElementById('userPassword').value = pendingPassword;
+                
+                // Clear pending data
+                localStorage.removeItem('pendingEmail');
+                localStorage.removeItem('pendingName');
+                localStorage.removeItem('pendingPassword');
+                
+                showToast('Please login again with your saved credentials', 'warning');
             }
         }
 
@@ -1791,9 +1824,27 @@ function createResponse(success, message, data = null) {
             if (url) {
                 localStorage.setItem('googleScriptUrl', url);
                 SCRIPT_URL = url;
-                localStorage.setItem('adminPassword', adminPassword);
+                if (adminPassword) {
+                    localStorage.setItem('adminPassword', adminPassword);
+                }
                 showToast('Settings saved successfully!', 'success');
                 updateConnectionStatus();
+                
+                // If user is logged out but has pending credentials, try to login
+                if (!currentUser) {
+                    const pendingEmail = localStorage.getItem('pendingEmail');
+                    const pendingName = localStorage.getItem('pendingName');
+                    const pendingPassword = localStorage.getItem('pendingPassword');
+                    
+                    if (pendingEmail && pendingPassword && pendingName) {
+                        showToast('Attempting to login with saved credentials...', 'warning');
+                        setTimeout(() => {
+                            loginUser(pendingEmail, pendingPassword, pendingName);
+                        }, 1000);
+                    }
+                }
+            } else {
+                showToast('Please enter a valid script URL', 'error');
             }
         }
 
@@ -1832,11 +1883,18 @@ function createResponse(success, message, data = null) {
 
         // Trade Management
         async function loadUserTrades() {
-            if (!currentUser || !SCRIPT_URL) return;
+            if (!currentUser || !SCRIPT_URL) {
+                console.log('Cannot load trades: No user or no SCRIPT_URL');
+                return;
+            }
 
             try {
+                showToast('Loading trades...', 'warning');
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'getUserTrades',
                         userId: currentUser.userId
@@ -1851,11 +1909,14 @@ function createResponse(success, message, data = null) {
                     updateDashboard();
                     renderJournalTable();
                     renderAnalysis();
+                    renderRiskAnalysis();
                 } else {
                     showToast('Failed to load trades: ' + result.message, 'error');
+                    trades = [];
                 }
             } catch (error) {
                 showToast('Failed to load trades: ' + error.message, 'error');
+                trades = [];
             }
         }
 
@@ -1897,6 +1958,9 @@ function createResponse(success, message, data = null) {
 
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'addTrade',
                         userId: currentUser.userId,
@@ -1931,6 +1995,9 @@ function createResponse(success, message, data = null) {
 
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'updateTrade',
                         userId: currentUser.userId,
@@ -1953,6 +2020,9 @@ function createResponse(success, message, data = null) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'deleteTrade',
                         userId: currentUser.userId,
@@ -1978,6 +2048,9 @@ function createResponse(success, message, data = null) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'deleteAllUserTrades',
                         userId: currentUser.userId
@@ -1996,6 +2069,9 @@ function createResponse(success, message, data = null) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'uploadScreenshot',
                         userId: currentUser.userId,
@@ -2021,6 +2097,9 @@ function createResponse(success, message, data = null) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ action: 'getAllUsers' })
                 });
                 
@@ -2030,6 +2109,16 @@ function createResponse(success, message, data = null) {
                     const users = result.data || [];
                     localStorage.setItem('allUsers', JSON.stringify(users));
                     renderUsersList(users);
+                    
+                    // Set first user as admin
+                    if (users.length > 0 && !localStorage.getItem('adminEmail')) {
+                        localStorage.setItem('adminEmail', users[0].email);
+                    }
+                    
+                    // Show admin controls if current user is admin
+                    if (currentUser && currentUser.email === localStorage.getItem('adminEmail')) {
+                        document.getElementById('adminControls').style.display = 'block';
+                    }
                 } else {
                     showToast('Failed to load users: ' + result.message, 'error');
                 }
@@ -2039,7 +2128,7 @@ function createResponse(success, message, data = null) {
         }
 
         async function deleteAllUsersDataFromCloud() {
-            const adminPassword = localStorage.getItem('adminPassword');
+            const adminPassword = localStorage.getItem('adminPassword') || document.getElementById('adminPassword').value;
             if (!adminPassword) {
                 showToast('Please set admin password in settings first', 'error');
                 navigateToPage('settings');
@@ -2053,6 +2142,9 @@ function createResponse(success, message, data = null) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         action: 'deleteAllUsersData',
                         adminPassword: adminPassword
@@ -2158,6 +2250,7 @@ function createResponse(success, message, data = null) {
                     btn.classList.add('active');
                     currentTimePeriod = btn.dataset.period;
                     updateDashboard();
+                    renderRiskAnalysis();
                 });
             });
 
@@ -2169,6 +2262,8 @@ function createResponse(success, message, data = null) {
                     showToast('All your trades deleted successfully!', 'success');
                     updateDashboard();
                     renderJournalTable();
+                    renderAnalysis();
+                    renderRiskAnalysis();
                 }
             });
 
@@ -2319,6 +2414,7 @@ function createResponse(success, message, data = null) {
             updateDashboard();
             renderJournalTable();
             renderAnalysis();
+            renderRiskAnalysis();
         }
 
         // Filter trades by time period
@@ -2933,20 +3029,25 @@ function createResponse(success, message, data = null) {
                     ${users.map(user => {
                         const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
                         const isCurrentUser = currentUser && user.userId === currentUser.userId;
+                        const isAdmin = user.email === localStorage.getItem('adminEmail');
                         
                         return `
                             <div class="user-card ${isCurrentUser ? 'current-user' : ''}" style="${isCurrentUser ? 'border: 2px solid var(--primary);' : ''}">
-                                <div class="user-card-avatar">${initials.slice(0, 2)}</div>
+                                <div class="user-card-avatar" style="${isAdmin ? 'background: var(--warning);' : ''}">
+                                    ${initials.slice(0, 2)}
+                                    ${isAdmin ? '<span class="material-icons" style="font-size: 12px; position: absolute; bottom: -5px; right: -5px;">star</span>' : ''}
+                                </div>
                                 <div class="user-card-info">
                                     <div class="user-card-name">
                                         ${user.name}
                                         ${isCurrentUser ? '<span style="font-size: 12px; color: var(--primary); margin-left: 8px;">(You)</span>' : ''}
+                                        ${isAdmin ? '<span style="font-size: 12px; color: var(--warning); margin-left: 8px;">(Admin)</span>' : ''}
                                     </div>
                                     <div class="user-card-email">${user.email}</div>
                                     <div class="user-card-stats">
                                         <div class="user-card-stat">
                                             <span class="material-icons" style="font-size: 14px;">bar_chart</span>
-                                            ${user.tradeCount} trades
+                                            ${user.tradeCount || 0} trades
                                         </div>
                                         <div class="user-card-stat">
                                             <span class="material-icons" style="font-size: 14px;">calendar_today</span>
@@ -2976,6 +3077,7 @@ function createResponse(success, message, data = null) {
                 updateDashboard();
                 renderJournalTable();
                 renderAnalysis();
+                renderRiskAnalysis();
             }
         }
 
@@ -2988,7 +3090,7 @@ function createResponse(success, message, data = null) {
 
         function formatDateShort(dateString) {
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
         function getResultColor(result) {
