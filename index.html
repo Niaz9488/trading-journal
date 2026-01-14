@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal - Advanced Analytics</title>
+    <title>Multi-User Trading Journal - Cloud Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -49,6 +49,48 @@
             padding: 20px;
         }
 
+        /* Login Page */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: var(--card-light);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .login-container {
+            background: var(--card-dark);
+        }
+
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+        }
+
+        /* Main App */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
         /* Header */
         header {
             background: var(--card-light);
@@ -79,6 +121,29 @@
             display: flex;
             gap: 12px;
             align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .user-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
 
         .sync-status {
@@ -192,6 +257,16 @@
         .btn-warning {
             background: var(--warning);
             color: white;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
@@ -493,48 +568,72 @@
         .toast.error { background: var(--error); }
         .toast.warning { background: var(--warning); }
 
-        /* Setup Instructions */
-        .setup-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 24px;
+        /* User Management */
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .setup-card h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 20px;
-            margin-bottom: 16px;
+        .user-card {
+            background: var(--card-light);
+            border-radius: 12px;
+            padding: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 16px;
+            transition: all 0.3s ease;
         }
 
-        .setup-steps {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 16px;
+        body.dark-mode .user-card {
+            background: var(--card-dark);
         }
 
-        .setup-steps ol {
-            margin-left: 20px;
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
-        .setup-steps li {
-            margin-bottom: 12px;
-            line-height: 1.6;
+        .user-card-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
         }
 
-        .code-block {
-            background: rgba(0,0,0,0.3);
-            padding: 12px;
-            border-radius: 6px;
-            font-family: 'Roboto Mono', monospace;
+        .user-card-info {
+            flex: 1;
+        }
+
+        .user-card-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .user-card-email {
             font-size: 12px;
-            margin: 8px 0;
-            overflow-x: auto;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .user-card-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .user-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         /* Filters */
@@ -557,11 +656,21 @@
             opacity: 0.8;
         }
 
-        /* Charts */
-        .chart-container {
-            height: 300px;
-            margin-top: 20px;
-            position: relative;
+        /* Admin Controls */
+        .admin-controls {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-controls h3 {
+            color: var(--warning);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* Performance Indicators */
@@ -636,47 +745,6 @@
             color: white;
         }
 
-        /* Day Performance */
-        .day-performance {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .day-card {
-            background: var(--card-light);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .day-card {
-            background: var(--card-dark);
-        }
-
-        .day-card.best {
-            border: 2px solid var(--profit);
-        }
-
-        .day-card.worst {
-            border: 2px solid var(--loss);
-        }
-
-        .day-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .day-profit {
-            font-size: 18px;
-            font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-        }
-
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -700,18 +768,6 @@
             margin-bottom: 20px;
         }
 
-        /* Screenshot Preview */
-        .screenshot-preview {
-            margin-top: 16px;
-            text-align: center;
-        }
-
-        .screenshot-preview img {
-            max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             h1 { font-size: 20px; }
@@ -720,191 +776,352 @@
             .filters { flex-direction: column; }
             .header-controls { flex-wrap: wrap; }
             .performance-indicators { grid-template-columns: repeat(2, 1fr); }
-            .day-performance { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 480px) {
             .performance-indicators { grid-template-columns: 1fr; }
-            .day-performance { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* Badge */
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
-        .badge-profit {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--profit);
-        }
-
-        .badge-loss {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--loss);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid var(--border-light);
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .tabs {
-            border-bottom-color: var(--border-dark);
-        }
-
-        .tab {
-            padding: 10px 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-            color: var(--text-light);
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .tab {
-            color: var(--text-dark);
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            .user-list { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>
-                <span class="material-icons">analytics</span>
-                Trading Journal - Advanced Analytics
-            </h1>
-            <div class="header-controls">
-                <div class="sync-status disconnected" id="syncStatus">
-                    <span class="material-icons">cloud_off</span>
-                    <span>Not Connected</span>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="user-avatar">
+            <span class="material-icons">account_circle</span>
+        </div>
+        <h1>Multi-User Trading Journal</h1>
+        
+        <div class="form-group">
+            <label for="userEmail">Email Address</label>
+            <input type="email" id="userEmail" placeholder="your.email@example.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="userName">Display Name</label>
+            <input type="text" id="userName" placeholder="John Trader" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="userPassword">Password</label>
+            <input type="password" id="userPassword" placeholder="••••••••" required>
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
+            <span class="material-icons">login</span>
+            Login / Register
+        </button>
+        
+        <p style="text-align: center; font-size: 12px; opacity: 0.7;">
+            First time users will be automatically registered
+        </p>
+    </div>
+
+    <!-- Main App -->
+    <div id="appContainer" class="app-container">
+        <div class="container">
+            <header>
+                <h1>
+                    <span class="material-icons">analytics</span>
+                    Multi-User Trading Journal
+                </h1>
+                <div class="header-controls">
+                    <div class="user-info" id="currentUserInfo">
+                        <div class="user-avatar-small" id="userAvatarSmall">U</div>
+                        <span id="userDisplayName">User</span>
+                    </div>
+                    <div class="sync-status disconnected" id="syncStatus">
+                        <span class="material-icons">cloud_off</span>
+                        <span>Not Connected</span>
+                    </div>
+                    <button class="btn btn-icon btn-secondary" id="themeToggle">
+                        <span class="material-icons">dark_mode</span>
+                    </button>
+                    <button class="btn btn-primary" id="addTradeBtn">
+                        <span class="material-icons">add</span>
+                        Add Trade
+                    </button>
                 </div>
-                <button class="btn btn-icon btn-secondary" id="themeToggle">
-                    <span class="material-icons">dark_mode</span>
-                </button>
-                <button class="btn btn-primary" id="addTradeBtn">
-                    <span class="material-icons">add</span>
-                    Add Trade
-                </button>
-            </div>
-        </header>
+            </header>
 
-        <nav>
-            <div class="nav-tabs">
-                <button class="nav-tab active" data-page="setup">
-                    <span class="material-icons">settings</span>
-                    Setup
-                </button>
-                <button class="nav-tab" data-page="dashboard">
-                    <span class="material-icons">dashboard</span>
-                    Dashboard
-                </button>
-                <button class="nav-tab" data-page="journal">
-                    <span class="material-icons">book</span>
-                    Journal
-                </button>
-                <button class="nav-tab" data-page="analysis">
-                    <span class="material-icons">insights</span>
-                    Analysis
-                </button>
-                <button class="nav-tab" data-page="risk">
-                    <span class="material-icons">security</span>
-                    Risk/Reward
-                </button>
-            </div>
-        </nav>
+            <nav>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-page="dashboard">
+                        <span class="material-icons">dashboard</span>
+                        Dashboard
+                    </button>
+                    <button class="nav-tab" data-page="journal">
+                        <span class="material-icons">book</span>
+                        Journal
+                    </button>
+                    <button class="nav-tab" data-page="analysis">
+                        <span class="material-icons">insights</span>
+                        Analysis
+                    </button>
+                    <button class="nav-tab" data-page="risk">
+                        <span class="material-icons">security</span>
+                        Risk/Reward
+                    </button>
+                    <button class="nav-tab" data-page="users" id="usersTab">
+                        <span class="material-icons">group</span>
+                        Users
+                    </button>
+                    <button class="nav-tab" data-page="settings">
+                        <span class="material-icons">settings</span>
+                        Settings
+                    </button>
+                    <button class="btn btn-danger" id="logoutBtn" style="margin-left: auto;">
+                        <span class="material-icons">logout</span>
+                        Logout
+                    </button>
+                </div>
+            </nav>
 
-        <main>
-            <!-- Setup Page -->
-            <div id="setup" class="page active">
-                <div class="setup-card">
-                    <h3>
-                        <span class="material-icons">cloud</span>
-                        Google Sheets & Drive Integration Setup
-                    </h3>
-                    <p>Follow these steps to connect your Trading Journal with Google Sheets and Google Drive:</p>
-                    
-                    <div class="setup-steps">
-                        <ol>
-                            <li><strong>Create a Google Sheet:</strong>
-                                <ul>
-                                    <li>Go to <a href="https://sheets.google.com" target="_blank" style="color: #ffd700;">sheets.google.com</a></li>
-                                    <li>Create a new spreadsheet named "Trading Journal"</li>
-                                    <li>Copy the Spreadsheet ID from the URL (between /d/ and /edit)</li>
-                                </ul>
-                            </li>
-                            <li><strong>Enable Google Apps Script:</strong>
-                                <ul>
-                                    <li>In your Google Sheet, go to Extensions → Apps Script</li>
-                                    <li>Delete any default code</li>
-                                    <li>Copy and paste the provided Apps Script code (see below)</li>
-                                    <li>Click "Deploy" → "New deployment" → "Web app"</li>
-                                    <li>Set "Execute as" to "Me" and "Who has access" to "Anyone"</li>
-                                    <li>Copy the deployment URL</li>
-                                </ul>
-                            </li>
-                            <li><strong>Configure the Application:</strong>
-                                <ul>
-                                    <li>Paste your deployment URL in the field below</li>
-                                    <li>Click "Connect to Google Sheets"</li>
-                                </ul>
-                            </li>
-                        </ol>
+            <main>
+                <!-- Dashboard Page -->
+                <div id="dashboard" class="page active">
+                    <div class="time-filters">
+                        <button class="time-filter-btn active" data-period="all">All Time</button>
+                        <button class="time-filter-btn" data-period="today">Today</button>
+                        <button class="time-filter-btn" data-period="week">This Week</button>
+                        <button class="time-filter-btn" data-period="month">This Month</button>
+                        <button class="time-filter-btn" data-period="year">This Year</button>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Profit/Loss</div>
+                            <div class="stat-value" id="totalProfitLoss">$0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Risk/Reward Ratio</div>
+                            <div class="stat-value" id="riskRewardRatio">0.00</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Win Rate</div>
+                            <div class="stat-value" id="winRate">0%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Average Risk</div>
+                            <div class="stat-value" id="averageRisk">$0</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="margin: 0;">
+                                <span class="material-icons">bar_chart</span>
+                                Recent Trades
+                            </h2>
+                            <button class="btn btn-success" id="syncBtn">
+                                <span class="material-icons">sync</span>
+                                Sync from Cloud
+                            </button>
+                        </div>
+                        <div id="recentTradesContainer"></div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">link</span>
-                        Connection Settings
-                    </h2>
-                    <div class="form-group">
-                        <label for="scriptUrl">Google Apps Script Deployment URL</label>
-                        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+                <!-- Journal Page -->
+                <div id="journal" class="page">
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">filter_list</span>
+                            Filters
+                        </h2>
+                        <div class="filters">
+                            <div class="filter-group">
+                                <label>Search</label>
+                                <input type="text" id="searchFilter" placeholder="Search by pair or notes...">
+                            </div>
+                            <div class="filter-group">
+                                <label>Session</label>
+                                <select id="sessionFilter">
+                                    <option value="">All Sessions</option>
+                                    <option value="Asian">Asian</option>
+                                    <option value="European">European</option>
+                                    <option value="American">American</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Result</label>
+                                <select id="resultFilter">
+                                    <option value="">All Results</option>
+                                    <option value="Win">Win</option>
+                                    <option value="Loss">Loss</option>
+                                    <option value="Breakeven">Breakeven</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Date Range</label>
+                                <input type="date" id="dateFromFilter">
+                                <input type="date" id="dateToFilter" style="margin-top: 4px;">
+                            </div>
+                            <button class="btn btn-secondary" id="clearFilters">
+                                <span class="material-icons">clear</span>
+                                Clear All
+                            </button>
+                        </div>
                     </div>
-                    <button class="btn btn-success" id="connectBtn">
-                        <span class="material-icons">cloud_done</span>
-                        Connect to Google Sheets
-                    </button>
-                    <button class="btn btn-warning" id="testConnectionBtn" style="margin-left: 12px;">
-                        <span class="material-icons">sync</span>
-                        Test Connection
-                    </button>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="margin: 0;">
+                                <span class="material-icons">table_chart</span>
+                                All Trades
+                                <span class="badge" id="tradeCountBadge">0 trades</span>
+                            </h2>
+                            <div>
+                                <button class="btn btn-danger" id="deleteAllBtn" style="margin-right: 12px;">
+                                    <span class="material-icons">delete_sweep</span>
+                                    Delete All My Trades
+                                </button>
+                                <button class="btn btn-warning" id="refreshBtn">
+                                    <span class="material-icons">refresh</span>
+                                    Refresh from Cloud
+                                </button>
+                            </div>
+                        </div>
+                        <div id="journalTableContainer"></div>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">code</span>
-                        Google Apps Script Code
-                    </h2>
-                    <p>Copy this code to your Google Apps Script editor:</p>
-                    <div class="code-block" id="appsScriptCode">
-// Trading Journal - Google Apps Script
-// This script handles data sync between the web app and Google Sheets
+                <!-- Analysis Page -->
+                <div id="analysis" class="page">
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">pie_chart</span>
+                            Performance by Pair
+                        </h2>
+                        <div id="pairAnalysisContainer"></div>
+                    </div>
 
-const SHEET_NAME = 'Trades';
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">schedule</span>
+                            Performance by Session
+                        </h2>
+                        <div id="sessionAnalysisContainer"></div>
+                    </div>
+
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">calendar_today</span>
+                            Performance by Day of Week
+                        </h2>
+                        <div id="dayAnalysisContainer"></div>
+                    </div>
+                </div>
+
+                <!-- Risk/Reward Page -->
+                <div id="risk" class="page">
+                    <div class="time-filters">
+                        <button class="time-filter-btn active" data-period="all">All Time</button>
+                        <button class="time-filter-btn" data-period="week">This Week</button>
+                        <button class="time-filter-btn" data-period="month">This Month</button>
+                        <button class="time-filter-btn" data-period="year">This Year</button>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Risk</div>
+                            <div class="stat-value" id="totalRisk">$0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Reward</div>
+                            <div class="stat-value" id="totalReward">$0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Net Profit/Loss</div>
+                            <div class="stat-value" id="netProfitLossRisk">$0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Risk/Reward Ratio</div>
+                            <div class="stat-value" id="riskRewardRatioRisk">0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">show_chart</span>
+                            Risk/Reward Distribution
+                        </h2>
+                        <div class="performance-indicators" id="riskRewardDistribution"></div>
+                    </div>
+                </div>
+
+                <!-- Users Page -->
+                <div id="users" class="page">
+                    <div class="admin-controls" id="adminControls" style="display: none;">
+                        <h3>
+                            <span class="material-icons">admin_panel_settings</span>
+                            Admin Controls
+                        </h3>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-danger" id="deleteAllUsersDataBtn">
+                                <span class="material-icons">delete_forever</span>
+                                Delete All Users Data from Cloud
+                            </button>
+                            <button class="btn btn-warning" id="syncAllUsersBtn">
+                                <span class="material-icons">sync_all</span>
+                                Sync All Users Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">group</span>
+                            Registered Users
+                        </h2>
+                        <div id="usersListContainer"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings" class="page">
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">cloud</span>
+                            Cloud Settings
+                        </h2>
+                        <div class="form-group">
+                            <label for="scriptUrl">Google Apps Script Deployment URL</label>
+                            <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Admin Password (for cloud management)</label>
+                            <input type="password" id="adminPassword" placeholder="Enter admin password">
+                        </div>
+                        <button class="btn btn-success" id="saveSettingsBtn">
+                            <span class="material-icons">save</span>
+                            Save Settings
+                        </button>
+                        <button class="btn btn-warning" id="testConnectionBtn" style="margin-left: 12px;">
+                            <span class="material-icons">sync</span>
+                            Test Connection
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h2>
+                            <span class="material-icons">code</span>
+                            Google Apps Script Code
+                        </h2>
+                        <p>Copy this code to your Google Apps Script editor:</p>
+                        <div class="code-block" id="appsScriptCode">
+// Multi-User Trading Journal - Google Apps Script
+// This script handles multi-user data separation
+
+const SHEET_NAME = 'UsersData';
 const SCREENSHOTS_FOLDER_NAME = 'Trading Journal Screenshots';
+const ADMIN_PASSWORD = 'admin123'; // Change this password
 
 // Initialize spreadsheet
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
-    message: 'Trading Journal API is ready'
+    message: 'Multi-User Trading Journal API is ready'
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -915,16 +1132,28 @@ function doPost(e) {
     const action = data.action;
     
     switch(action) {
+      case 'login':
+        return loginUser(data.email, data.password, data.name);
       case 'addTrade':
-        return addTrade(data.trade);
-      case 'getAllTrades':
-        return getAllTrades();
+        return addTrade(data.userId, data.trade);
+      case 'getUserTrades':
+        return getUserTrades(data.userId);
       case 'updateTrade':
-        return updateTrade(data.id, data.trade);
+        return updateTrade(data.userId, data.tradeId, data.trade);
       case 'deleteTrade':
-        return deleteTrade(data.id);
+        return deleteTrade(data.userId, data.tradeId);
+      case 'deleteAllUserTrades':
+        return deleteAllUserTrades(data.userId);
       case 'uploadScreenshot':
-        return uploadScreenshot(data.screenshot, data.filename);
+        return uploadScreenshot(data.userId, data.screenshot, data.filename);
+      case 'getAllUsers':
+        return getAllUsers();
+      case 'deleteAllUsersData':
+        return deleteAllUsersData(data.adminPassword);
+      case 'getAllUsersTrades':
+        return getAllUsersTrades(data.adminPassword);
+      case 'getUserStats':
+        return getUserStats(data.userId);
       default:
         return createResponse(false, 'Unknown action');
     }
@@ -933,25 +1162,87 @@ function doPost(e) {
   }
 }
 
-// Get or create sheet
+// Get or create main sheet
 function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
   
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(['ID', 'Date', 'Time', 'Pair', 'Session', 'Type', 'Result', 
-                     'Entry Price', 'Exit Price', 'Notes', 'Risk Amount', 'Reward Amount',
-                     'Profit/Loss', 'Screenshot URL', 'Created At']);
+    sheet.appendRow(['User ID', 'Email', 'Name', 'Password Hash', 'Created At', 'Last Login']);
   }
   
   return sheet;
 }
 
-// Add new trade
-function addTrade(trade) {
+// Get or create user trades sheet
+function getUserTradesSheet(userId) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetName = `Trades_${userId}`;
+  let sheet = ss.getSheetByName(sheetName);
+  
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+    sheet.appendRow(['Trade ID', 'Date', 'Time', 'Pair', 'Session', 'Type', 'Result', 
+                     'Entry Price', 'Exit Price', 'Risk Amount', 'Reward Amount',
+                     'Profit/Loss', 'Notes', 'Screenshot URL', 'Created At']);
+  }
+  
+  return sheet;
+}
+
+// User authentication
+function loginUser(email, password, name) {
   const sheet = getSheet();
-  const id = new Date().getTime().toString();
+  const data = sheet.getDataRange().getValues();
+  
+  // Find existing user
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][1] === email) {
+      // Verify password
+      const storedHash = data[i][3];
+      const inputHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, password).toString();
+      
+      if (storedHash === inputHash) {
+        // Update last login
+        sheet.getRange(i + 1, 6).setValue(new Date().toISOString());
+        
+        return createResponse(true, 'Login successful', {
+          userId: data[i][0],
+          email: data[i][1],
+          name: data[i][2],
+          createdAt: data[i][4],
+          lastLogin: data[i][5]
+        });
+      } else {
+        return createResponse(false, 'Invalid password');
+      }
+    }
+  }
+  
+  // Create new user
+  const userId = Utilities.getUuid();
+  const passwordHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, password).toString();
+  const now = new Date().toISOString();
+  
+  sheet.appendRow([userId, email, name, passwordHash, now, now]);
+  
+  // Create user trades sheet
+  getUserTradesSheet(userId);
+  
+  return createResponse(true, 'User registered successfully', {
+    userId: userId,
+    email: email,
+    name: name,
+    createdAt: now,
+    lastLogin: now
+  });
+}
+
+// Add trade for user
+function addTrade(userId, trade) {
+  const sheet = getUserTradesSheet(userId);
+  const tradeId = Utilities.getUuid();
   const createdAt = new Date().toISOString();
   
   // Calculate profit/loss
@@ -963,7 +1254,7 @@ function addTrade(trade) {
   }
   
   sheet.appendRow([
-    id,
+    tradeId,
     trade.date,
     trade.time,
     trade.pair,
@@ -972,24 +1263,24 @@ function addTrade(trade) {
     trade.result,
     trade.entryPrice || '',
     trade.exitPrice || '',
-    trade.notes || '',
     trade.riskAmount || '',
     trade.rewardAmount || '',
     profitLoss,
+    trade.notes || '',
     trade.screenshotUrl || '',
     createdAt
   ]);
   
   return createResponse(true, 'Trade added successfully', {
-    id: id,
+    tradeId: tradeId,
     createdAt: createdAt,
     profitLoss: profitLoss
   });
 }
 
-// Get all trades
-function getAllTrades() {
-  const sheet = getSheet();
+// Get user's trades
+function getUserTrades(userId) {
+  const sheet = getUserTradesSheet(userId);
   const data = sheet.getDataRange().getValues();
   const trades = [];
   
@@ -1004,10 +1295,10 @@ function getAllTrades() {
       result: data[i][6],
       entryPrice: data[i][7],
       exitPrice: data[i][8],
-      notes: data[i][9],
-      riskAmount: data[i][10],
-      rewardAmount: data[i][11],
-      profitLoss: parseFloat(data[i][12]) || 0,
+      riskAmount: data[i][9],
+      rewardAmount: data[i][10],
+      profitLoss: parseFloat(data[i][11]) || 0,
+      notes: data[i][12],
       screenshotUrl: data[i][13],
       createdAt: data[i][14]
     });
@@ -1016,13 +1307,13 @@ function getAllTrades() {
   return createResponse(true, 'Trades retrieved successfully', trades);
 }
 
-// Update trade
-function updateTrade(id, trade) {
-  const sheet = getSheet();
+// Update user's trade
+function updateTrade(userId, tradeId, trade) {
+  const sheet = getUserTradesSheet(userId);
   const data = sheet.getDataRange().getValues();
   
   for (let i = 1; i < data.length; i++) {
-    if (data[i][0] == id) {
+    if (data[i][0] == tradeId) {
       // Calculate profit/loss
       let profitLoss = 0;
       if (trade.result === 'Win' && trade.rewardAmount) {
@@ -1040,10 +1331,10 @@ function updateTrade(id, trade) {
         trade.result,
         trade.entryPrice || '',
         trade.exitPrice || '',
-        trade.notes || '',
         trade.riskAmount || '',
         trade.rewardAmount || '',
         profitLoss,
+        trade.notes || '',
         trade.screenshotUrl || ''
       ]]);
       return createResponse(true, 'Trade updated successfully');
@@ -1053,14 +1344,28 @@ function updateTrade(id, trade) {
   return createResponse(false, 'Trade not found');
 }
 
-// Delete trade
-function deleteTrade(id) {
-  const sheet = getSheet();
+// Delete user's trade
+function deleteTrade(userId, tradeId) {
+  const sheet = getUserTradesSheet(userId);
   const data = sheet.getDataRange().getValues();
   
   for (let i = 1; i < data.length; i++) {
-    if (data[i][0] == id) {
+    if (data[i][0] == tradeId) {
       sheet.deleteRow(i + 1);
+      
+      // Delete screenshot if exists
+      const screenshotUrl = data[i][13];
+      if (screenshotUrl) {
+        try {
+          const fileId = screenshotUrl.split('/d/')[1]?.split('/')[0];
+          if (fileId) {
+            DriveApp.getFileById(fileId).setTrashed(true);
+          }
+        } catch(e) {
+          console.log('Failed to delete screenshot:', e);
+        }
+      }
+      
       return createResponse(true, 'Trade deleted successfully');
     }
   }
@@ -1068,8 +1373,36 @@ function deleteTrade(id) {
   return createResponse(false, 'Trade not found');
 }
 
-// Upload screenshot to Google Drive
-function uploadScreenshot(base64Data, filename) {
+// Delete all user's trades
+function deleteAllUserTrades(userId) {
+  const sheet = getUserTradesSheet(userId);
+  
+  // Delete all rows except header
+  if (sheet.getLastRow() > 1) {
+    sheet.deleteRows(2, sheet.getLastRow() - 1);
+  }
+  
+  // Delete user's screenshots folder
+  try {
+    const userFolderName = `User_${userId}_Screenshots`;
+    const folders = DriveApp.getFoldersByName(userFolderName);
+    if (folders.hasNext()) {
+      const folder = folders.next();
+      const files = folder.getFiles();
+      while (files.hasNext()) {
+        files.next().setTrashed(true);
+      }
+      folder.setTrashed(true);
+    }
+  } catch(e) {
+    console.log('Failed to delete user screenshots folder:', e);
+  }
+  
+  return createResponse(true, 'All trades deleted successfully');
+}
+
+// Upload screenshot to user's folder
+function uploadScreenshot(userId, base64Data, filename) {
   try {
     const blob = Utilities.newBlob(
       Utilities.base64Decode(base64Data.split(',')[1]),
@@ -1077,13 +1410,15 @@ function uploadScreenshot(base64Data, filename) {
       filename
     );
     
-    const folders = DriveApp.getFoldersByName(SCREENSHOTS_FOLDER_NAME);
+    // Create user-specific folder
+    const userFolderName = `User_${userId}_Screenshots`;
     let folder;
+    const folders = DriveApp.getFoldersByName(userFolderName);
     
     if (folders.hasNext()) {
       folder = folders.next();
     } else {
-      folder = DriveApp.createFolder(SCREENSHOTS_FOLDER_NAME);
+      folder = DriveApp.createFolder(userFolderName);
     }
     
     const file = folder.createFile(blob);
@@ -1098,6 +1433,130 @@ function uploadScreenshot(base64Data, filename) {
   }
 }
 
+// Get all users (admin only)
+function getAllUsers() {
+  const sheet = getSheet();
+  const data = sheet.getDataRange().getValues();
+  const users = [];
+  
+  for (let i = 1; i < data.length; i++) {
+    // Get user's trade count
+    const userId = data[i][0];
+    const tradesSheet = getUserTradesSheet(userId);
+    const tradeCount = Math.max(0, tradesSheet.getLastRow() - 1);
+    
+    users.push({
+      userId: userId,
+      email: data[i][1],
+      name: data[i][2],
+      createdAt: data[i][4],
+      lastLogin: data[i][5],
+      tradeCount: tradeCount
+    });
+  }
+  
+  return createResponse(true, 'Users retrieved successfully', users);
+}
+
+// Get user statistics
+function getUserStats(userId) {
+  const trades = getUserTradesSheet(userId).getDataRange().getValues();
+  let totalTrades = Math.max(0, trades.length - 1);
+  let wins = 0;
+  let losses = 0;
+  let totalProfitLoss = 0;
+  
+  for (let i = 1; i < trades.length; i++) {
+    if (trades[i][6] === 'Win') wins++;
+    if (trades[i][6] === 'Loss') losses++;
+    totalProfitLoss += parseFloat(trades[i][11]) || 0;
+  }
+  
+  const winRate = totalTrades > 0 ? (wins / totalTrades * 100).toFixed(1) : 0;
+  
+  return createResponse(true, 'User stats retrieved', {
+    totalTrades: totalTrades,
+    wins: wins,
+    losses: losses,
+    winRate: winRate,
+    totalProfitLoss: totalProfitLoss
+  });
+}
+
+// Delete all users data (admin only)
+function deleteAllUsersData(adminPassword) {
+  if (adminPassword !== ADMIN_PASSWORD) {
+    return createResponse(false, 'Invalid admin password');
+  }
+  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Delete all sheets except UsersData
+  const sheets = ss.getSheets();
+  sheets.forEach(sheet => {
+    if (sheet.getName() !== SHEET_NAME) {
+      ss.deleteSheet(sheet);
+    }
+  });
+  
+  // Clear UsersData except header
+  const userSheet = ss.getSheetByName(SHEET_NAME);
+  if (userSheet.getLastRow() > 1) {
+    userSheet.deleteRows(2, userSheet.getLastRow() - 1);
+  }
+  
+  // Delete all screenshots folders
+  const folders = DriveApp.getFolders();
+  while (folders.hasNext()) {
+    const folder = folders.next();
+    if (folder.getName().includes('_Screenshots')) {
+      const files = folder.getFiles();
+      while (files.hasNext()) {
+        files.next().setTrashed(true);
+      }
+      folder.setTrashed(true);
+    }
+  }
+  
+  return createResponse(true, 'All users data deleted successfully');
+}
+
+// Get all users trades (admin only)
+function getAllUsersTrades(adminPassword) {
+  if (adminPassword !== ADMIN_PASSWORD) {
+    return createResponse(false, 'Invalid admin password');
+  }
+  
+  const allTrades = [];
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets();
+  
+  for (let sheet of sheets) {
+    const sheetName = sheet.getName();
+    if (sheetName.startsWith('Trades_')) {
+      const userId = sheetName.replace('Trades_', '');
+      const data = sheet.getDataRange().getValues();
+      
+      for (let i = 1; i < data.length; i++) {
+        allTrades.push({
+          userId: userId,
+          tradeId: data[i][0],
+          date: data[i][1],
+          time: data[i][2],
+          pair: data[i][3],
+          session: data[i][4],
+          type: data[i][5],
+          result: data[i][6],
+          profitLoss: parseFloat(data[i][11]) || 0,
+          createdAt: data[i][14]
+        });
+      }
+    }
+  }
+  
+  return createResponse(true, 'All trades retrieved', allTrades);
+}
+
 // Create response
 function createResponse(success, message, data = null) {
   const response = {
@@ -1110,281 +1569,15 @@ function createResponse(success, message, data = null) {
     .createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON);
 }
-                    </div>
-                    <button class="btn btn-secondary" id="copyCodeBtn">
-                        <span class="material-icons">content_copy</span>
-                        Copy Code
-                    </button>
-                </div>
-            </div>
-
-            <!-- Dashboard Page -->
-            <div id="dashboard" class="page">
-                <div class="time-filters">
-                    <button class="time-filter-btn active" data-period="all">All Time</button>
-                    <button class="time-filter-btn" data-period="today">Today</button>
-                    <button class="time-filter-btn" data-period="week">This Week</button>
-                    <button class="time-filter-btn" data-period="month">This Month</button>
-                    <button class="time-filter-btn" data-period="year">This Year</button>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Profit/Loss</div>
-                        <div class="stat-value" id="totalProfitLoss">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Risk/Reward Ratio</div>
-                        <div class="stat-value" id="riskRewardRatio">0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Win Rate</div>
-                        <div class="stat-value" id="winRate">0%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Average Risk</div>
-                        <div class="stat-value" id="averageRisk">$0</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">trending_up</span>
-                        Daily Performance (Last 7 Days)
-                        <span class="badge" id="bestDayBadge"></span>
-                        <span class="badge" id="worstDayBadge"></span>
-                    </h2>
-                    <div class="day-performance" id="dailyPerformance"></div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">schedule</span>
-                        Session Performance
-                    </h2>
-                    <div class="performance-indicators" id="sessionPerformance"></div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">bar_chart</span>
-                        Recent Trades
-                    </h2>
-                    <div id="recentTradesContainer"></div>
-                </div>
-            </div>
-
-            <!-- Journal Page -->
-            <div id="journal" class="page">
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">filter_list</span>
-                        Advanced Filters
-                    </h2>
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label>Search</label>
-                            <input type="text" id="searchFilter" placeholder="Search by pair or notes...">
                         </div>
-                        <div class="filter-group">
-                            <label>Session</label>
-                            <select id="sessionFilter">
-                                <option value="">All Sessions</option>
-                                <option value="Asian">Asian</option>
-                                <option value="European">European</option>
-                                <option value="American">American</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Result</label>
-                            <select id="resultFilter">
-                                <option value="">All Results</option>
-                                <option value="Win">Win</option>
-                                <option value="Loss">Loss</option>
-                                <option value="Breakeven">Breakeven</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Date Range</label>
-                            <input type="date" id="dateFromFilter">
-                            <input type="date" id="dateToFilter" style="margin-top: 4px;">
-                        </div>
-                        <div class="filter-group">
-                            <label>Profit/Loss</label>
-                            <select id="profitFilter">
-                                <option value="">All</option>
-                                <option value="profit">Profit Only</option>
-                                <option value="loss">Loss Only</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-secondary" id="clearFilters">
-                            <span class="material-icons">clear</span>
-                            Clear All
+                        <button class="btn btn-secondary" id="copyCodeBtn">
+                            <span class="material-icons">content_copy</span>
+                            Copy Code
                         </button>
                     </div>
                 </div>
-
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h2 style="margin: 0;">
-                            <span class="material-icons">table_chart</span>
-                            All Trades
-                            <span class="badge" id="tradeCountBadge">0 trades</span>
-                        </h2>
-                        <button class="btn btn-success" id="syncBtn">
-                            <span class="material-icons">sync</span>
-                            Sync from Cloud
-                        </button>
-                    </div>
-                    <div id="journalTableContainer"></div>
-                </div>
-            </div>
-
-            <!-- Analysis Page -->
-            <div id="analysis" class="page">
-                <div class="tabs">
-                    <button class="tab active" data-tab="pair-analysis">Pair Analysis</button>
-                    <button class="tab" data-tab="session-analysis">Session Analysis</button>
-                    <button class="tab" data-tab="day-analysis">Day of Week Analysis</button>
-                    <button class="tab" data-tab="time-analysis">Time Analysis</button>
-                </div>
-
-                <div class="tab-content active" id="pair-analysis">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">pie_chart</span>
-                            Performance by Pair
-                        </h2>
-                        <div id="pairAnalysisContainer"></div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="session-analysis">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">schedule</span>
-                            Performance by Session
-                        </h2>
-                        <div id="sessionAnalysisContainer"></div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="day-analysis">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">calendar_today</span>
-                            Performance by Day of Week
-                        </h2>
-                        <div id="dayAnalysisContainer"></div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="time-analysis">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">access_time</span>
-                            Performance by Time of Day
-                        </h2>
-                        <div id="timeAnalysisContainer"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Risk/Reward Page -->
-            <div id="risk" class="page">
-                <div class="time-filters">
-                    <button class="time-filter-btn active" data-period="all">All Time</button>
-                    <button class="time-filter-btn" data-period="week">This Week</button>
-                    <button class="time-filter-btn" data-period="month">This Month</button>
-                    <button class="time-filter-btn" data-period="year">This Year</button>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Risk</div>
-                        <div class="stat-value" id="totalRisk">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total Reward</div>
-                        <div class="stat-value" id="totalReward">$0</div>
-                    </div>
-                    <div class="stat-label">Net Profit/Loss</div>
-                        <div class="stat-value" id="netProfitLossRisk">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Risk/Reward Ratio</div>
-                        <div class="stat-value" id="riskRewardRatioRisk">0.00</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">show_chart</span>
-                        Risk/Reward Distribution
-                        <span class="badge badge-profit" id="bestRRR">Best RRR: 0.00</span>
-                        <span class="badge badge-loss" id="worstRRR">Worst RRR: 0.00</span>
-                    </h2>
-                    <div class="performance-indicators" id="riskRewardDistribution"></div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">security</span>
-                        Risk Management Summary
-                    </h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Average Risk per Trade</label>
-                            <div class="indicator-value" id="avgRiskPerTrade">$0</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Average Reward per Trade</label>
-                            <div class="indicator-value" id="avgRewardPerTrade">$0</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Largest Loss</label>
-                            <div class="indicator-value loss" id="largestLoss">$0</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Largest Win</label>
-                            <div class="indicator-value profit" id="largestWin">$0</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">stacked_bar_chart</span>
-                        Monthly Profit/Loss Trend
-                    </h2>
-                    <div id="monthlyTrendContainer"></div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">insights</span>
-                        Session-based Profit/Loss
-                        <select id="sessionTimeFilter" style="margin-left: 10px; width: auto; display: inline-block;">
-                            <option value="all">All Time</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="year">This Year</option>
-                        </select>
-                    </h2>
-                    <div id="sessionProfitLossContainer"></div>
-                </div>
-
-                <div class="card">
-                    <h2>
-                        <span class="material-icons">warning</span>
-                        Risk Analysis
-                    </h2>
-                    <div class="performance-indicators" id="riskAnalysis">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
     <!-- Add/Edit Trade Modal -->
@@ -1446,17 +1639,6 @@ function createResponse(success, message, data = null) {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="entryPrice">Entry Price</label>
-                        <input type="number" id="entryPrice" step="0.00001" placeholder="0.00000">
-                    </div>
-                    <div class="form-group">
-                        <label for="exitPrice">Exit Price</label>
-                        <input type="number" id="exitPrice" step="0.00001" placeholder="0.00000">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
                         <label for="riskAmount">Risk Amount ($)</label>
                         <input type="number" id="riskAmount" step="0.01" placeholder="100.00">
                     </div>
@@ -1494,22 +1676,104 @@ function createResponse(success, message, data = null) {
     <script>
         // Configuration
         let SCRIPT_URL = localStorage.getItem('googleScriptUrl') || '';
+        let currentUser = null;
         let trades = [];
         let currentEditId = null;
         let currentScreenshotData = null;
         let currentTimePeriod = 'all';
 
-        // Day names for analysis
-        const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const DAY_NAMES_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
             loadSettings();
-            updateConnectionStatus();
             initializeEventListeners();
-            updateDashboard();
         });
+
+        // Check if user is logged in
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        // Show/Hide sections
+        function showLogin() {
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('appContainer').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('appContainer').classList.add('active');
+            
+            updateUserInfo();
+            updateConnectionStatus();
+            updateDashboard();
+        }
+
+        // User Management
+        async function loginUser(email, password, name) {
+            if (!SCRIPT_URL) {
+                showToast('Please configure Google Sheets connection first', 'error');
+                navigateToPage('settings');
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: email,
+                        password: password,
+                        name: name
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentUser = result.data;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showApp();
+                    showToast('Login successful!', 'success');
+                    loadUserTrades();
+                } else {
+                    showToast('Login failed: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Login failed: ' + error.message, 'error');
+            }
+        }
+
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                trades = [];
+                localStorage.removeItem('currentUser');
+                showLogin();
+                showToast('Logged out successfully', 'success');
+            }
+        }
+
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('userDisplayName').textContent = currentUser.name;
+                const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('userAvatarSmall').textContent = initials.slice(0, 2);
+                
+                // Check if user is admin (first user)
+                const savedUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                if (savedUsers.length > 0 && savedUsers[0].email === currentUser.email) {
+                    document.getElementById('adminControls').style.display = 'block';
+                }
+            }
+        }
 
         // Settings Management
         function loadSettings() {
@@ -1522,9 +1786,12 @@ function createResponse(success, message, data = null) {
 
         function saveSettings() {
             const url = document.getElementById('scriptUrl').value.trim();
+            const adminPassword = document.getElementById('adminPassword').value;
+            
             if (url) {
                 localStorage.setItem('googleScriptUrl', url);
                 SCRIPT_URL = url;
+                localStorage.setItem('adminPassword', adminPassword);
                 showToast('Settings saved successfully!', 'success');
                 updateConnectionStatus();
             }
@@ -1563,42 +1830,59 @@ function createResponse(success, message, data = null) {
             }
         }
 
-        // Google Sheets API Functions (same as before, but with profit/loss calculation)
-        async function syncFromCloud() {
-            if (!SCRIPT_URL) {
-                showToast('Please configure Google Sheets connection first', 'error');
-                navigateToPage('setup');
-                return;
-            }
+        // Trade Management
+        async function loadUserTrades() {
+            if (!currentUser || !SCRIPT_URL) return;
 
             try {
-                showToast('Syncing from cloud...', 'warning');
-                
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'getAllTrades' })
+                    body: JSON.stringify({
+                        action: 'getUserTrades',
+                        userId: currentUser.userId
+                    })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
                     trades = result.data || [];
-                    showToast(`Synced ${trades.length} trades successfully!`, 'success');
+                    showToast(`Loaded ${trades.length} trades`, 'success');
                     updateDashboard();
                     renderJournalTable();
                     renderAnalysis();
-                    renderRiskAnalysis();
                 } else {
-                    showToast('Sync failed: ' + result.message, 'error');
+                    showToast('Failed to load trades: ' + result.message, 'error');
                 }
             } catch (error) {
-                showToast('Sync failed: ' + error.message, 'error');
+                showToast('Failed to load trades: ' + error.message, 'error');
+            }
+        }
+
+        async function refreshFromCloud() {
+            if (!currentUser) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
+            if (!SCRIPT_URL) {
+                showToast('Please configure Google Sheets connection first', 'error');
+                navigateToPage('settings');
+                return;
+            }
+
+            try {
+                showToast('Refreshing from cloud...', 'warning');
+                await loadUserTrades();
+                showToast('Data refreshed from cloud!', 'success');
+            } catch (error) {
+                showToast('Refresh failed: ' + error.message, 'error');
             }
         }
 
         async function addTradeToCloud(trade) {
-            if (!SCRIPT_URL) {
-                showToast('Not connected to cloud. Trade saved locally only.', 'warning');
+            if (!currentUser || !SCRIPT_URL) {
+                showToast('Not connected. Trade saved locally only.', 'warning');
                 return null;
             }
 
@@ -1611,19 +1895,11 @@ function createResponse(success, message, data = null) {
                     }
                 }
 
-                // Calculate profit/loss
-                if (trade.result === 'Win' && trade.rewardAmount) {
-                    trade.profitLoss = parseFloat(trade.rewardAmount);
-                } else if (trade.result === 'Loss' && trade.riskAmount) {
-                    trade.profitLoss = -parseFloat(trade.riskAmount);
-                } else {
-                    trade.profitLoss = 0;
-                }
-
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         action: 'addTrade',
+                        userId: currentUser.userId,
                         trade: trade
                     })
                 });
@@ -1641,13 +1917,13 @@ function createResponse(success, message, data = null) {
             }
         }
 
-        async function updateTradeInCloud(id, trade) {
-            if (!SCRIPT_URL) return null;
+        async function updateTradeInCloud(tradeId, trade) {
+            if (!currentUser || !SCRIPT_URL) return null;
 
             try {
                 // Upload new screenshot if changed
                 if (currentScreenshotData) {
-                    const screenshotResult = await uploadScreenshot(currentScreenshotData, `screenshot_${id}_${Date.now()}.png`);
+                    const screenshotResult = await uploadScreenshot(currentScreenshotData, `screenshot_${tradeId}_${Date.now()}.png`);
                     if (screenshotResult.success) {
                         trade.screenshotUrl = screenshotResult.data.url;
                     }
@@ -1655,9 +1931,10 @@ function createResponse(success, message, data = null) {
 
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         action: 'updateTrade',
-                        id: id,
+                        userId: currentUser.userId,
+                        tradeId: tradeId,
                         trade: trade
                     })
                 });
@@ -1670,15 +1947,40 @@ function createResponse(success, message, data = null) {
             }
         }
 
-        async function deleteTradeFromCloud(id) {
-            if (!SCRIPT_URL) return true;
+        async function deleteTradeFromCloud(tradeId) {
+            if (!currentUser || !SCRIPT_URL) return true;
 
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         action: 'deleteTrade',
-                        id: id
+                        userId: currentUser.userId,
+                        tradeId: tradeId
+                    })
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Cloud delete error:', error);
+                return false;
+            }
+        }
+
+        async function deleteAllUserTradesFromCloud() {
+            if (!currentUser || !SCRIPT_URL) return true;
+
+            if (!confirm('Are you sure you want to delete ALL your trades? This action cannot be undone!')) {
+                return false;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'deleteAllUserTrades',
+                        userId: currentUser.userId
                     })
                 });
                 
@@ -1694,8 +1996,9 @@ function createResponse(success, message, data = null) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         action: 'uploadScreenshot',
+                        userId: currentUser.userId,
                         screenshot: base64Data,
                         filename: filename
                     })
@@ -1708,8 +2011,87 @@ function createResponse(success, message, data = null) {
             }
         }
 
+        // User Management Functions
+        async function loadAllUsers() {
+            if (!SCRIPT_URL) {
+                showToast('Please configure Google Sheets connection first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getAllUsers' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const users = result.data || [];
+                    localStorage.setItem('allUsers', JSON.stringify(users));
+                    renderUsersList(users);
+                } else {
+                    showToast('Failed to load users: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Failed to load users: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteAllUsersDataFromCloud() {
+            const adminPassword = localStorage.getItem('adminPassword');
+            if (!adminPassword) {
+                showToast('Please set admin password in settings first', 'error');
+                navigateToPage('settings');
+                return;
+            }
+
+            if (!confirm('⚠️ DANGER: This will delete ALL users data from Google Sheets and Drive! Are you absolutely sure?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'deleteAllUsersData',
+                        adminPassword: adminPassword
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('All users data deleted from cloud!', 'success');
+                    // Clear local data
+                    trades = [];
+                    localStorage.removeItem('allUsers');
+                    updateDashboard();
+                    renderJournalTable();
+                    renderUsersList([]);
+                } else {
+                    showToast('Failed: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Delete failed: ' + error.message, 'error');
+            }
+        }
+
         // Event Listeners
         function initializeEventListeners() {
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const email = document.getElementById('userEmail').value.trim();
+                const name = document.getElementById('userName').value.trim();
+                const password = document.getElementById('userPassword').value;
+                
+                if (email && name && password) {
+                    loginUser(email, password, name);
+                } else {
+                    showToast('Please fill all fields', 'error');
+                }
+            });
+
             // Theme Toggle
             const themeToggle = document.getElementById('themeToggle');
             const savedTheme = localStorage.getItem('theme');
@@ -1733,37 +2115,14 @@ function createResponse(success, message, data = null) {
                 });
             });
 
-            // Tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.dataset.tab;
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-
-            // Time Filters
-            document.querySelectorAll('.time-filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.time-filter-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentTimePeriod = btn.dataset.period;
-                    updateDashboard();
-                    renderRiskAnalysis();
-                });
-            });
-
-            // Session Time Filter
-            document.getElementById('sessionTimeFilter').addEventListener('change', () => {
-                renderSessionProfitLoss();
-            });
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
 
             // Connection
-            document.getElementById('connectBtn').addEventListener('click', saveSettings);
+            document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
             document.getElementById('testConnectionBtn').addEventListener('click', testConnection);
-            document.getElementById('syncBtn').addEventListener('click', syncFromCloud);
+            document.getElementById('syncBtn').addEventListener('click', refreshFromCloud);
+            document.getElementById('refreshBtn').addEventListener('click', refreshFromCloud);
 
             // Copy Code
             document.getElementById('copyCodeBtn').addEventListener('click', () => {
@@ -1790,8 +2149,41 @@ function createResponse(success, message, data = null) {
             document.getElementById('resultFilter').addEventListener('change', renderJournalTable);
             document.getElementById('dateFromFilter').addEventListener('change', renderJournalTable);
             document.getElementById('dateToFilter').addEventListener('change', renderJournalTable);
-            document.getElementById('profitFilter').addEventListener('change', renderJournalTable);
             document.getElementById('clearFilters').addEventListener('click', clearFilters);
+
+            // Time Filters
+            document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.time-filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTimePeriod = btn.dataset.period;
+                    updateDashboard();
+                });
+            });
+
+            // Delete Operations
+            document.getElementById('deleteAllBtn').addEventListener('click', async () => {
+                const success = await deleteAllUserTradesFromCloud();
+                if (success) {
+                    trades = [];
+                    showToast('All your trades deleted successfully!', 'success');
+                    updateDashboard();
+                    renderJournalTable();
+                }
+            });
+
+            document.getElementById('deleteAllUsersDataBtn').addEventListener('click', deleteAllUsersDataFromCloud);
+
+            // Users Page
+            document.getElementById('usersTab').addEventListener('click', () => {
+                loadAllUsers();
+            });
+
+            document.getElementById('syncAllUsersBtn').addEventListener('click', async () => {
+                showToast('Syncing all users data...', 'warning');
+                await loadAllUsers();
+                showToast('All users data synced!', 'success');
+            });
         }
 
         function navigateToPage(pageId) {
@@ -1805,6 +2197,7 @@ function createResponse(success, message, data = null) {
             if (pageId === 'journal') renderJournalTable();
             if (pageId === 'analysis') renderAnalysis();
             if (pageId === 'risk') renderRiskAnalysis();
+            if (pageId === 'users') loadAllUsers();
         }
 
         // Screenshot Handling
@@ -1836,8 +2229,6 @@ function createResponse(success, message, data = null) {
                 document.getElementById('tradeSession').value = editTrade.session;
                 document.getElementById('tradeType').value = editTrade.type;
                 document.getElementById('tradeResult').value = editTrade.result;
-                document.getElementById('entryPrice').value = editTrade.entryPrice || '';
-                document.getElementById('exitPrice').value = editTrade.exitPrice || '';
                 document.getElementById('riskAmount').value = editTrade.riskAmount || '';
                 document.getElementById('rewardAmount').value = editTrade.rewardAmount || '';
                 document.getElementById('tradeNotes').value = editTrade.notes || '';
@@ -1878,8 +2269,6 @@ function createResponse(success, message, data = null) {
                 session: document.getElementById('tradeSession').value,
                 type: document.getElementById('tradeType').value,
                 result: document.getElementById('tradeResult').value,
-                entryPrice: document.getElementById('entryPrice').value,
-                exitPrice: document.getElementById('exitPrice').value,
                 riskAmount: document.getElementById('riskAmount').value,
                 rewardAmount: document.getElementById('rewardAmount').value,
                 notes: document.getElementById('tradeNotes').value
@@ -1906,7 +2295,7 @@ function createResponse(success, message, data = null) {
                 const cloudResult = await addTradeToCloud(tradeData);
                 
                 if (cloudResult) {
-                    tradeData.id = cloudResult.id;
+                    tradeData.id = cloudResult.tradeId;
                     tradeData.createdAt = cloudResult.createdAt;
                     tradeData.profitLoss = cloudResult.profitLoss || 0;
                 } else {
@@ -1930,7 +2319,6 @@ function createResponse(success, message, data = null) {
             updateDashboard();
             renderJournalTable();
             renderAnalysis();
-            renderRiskAnalysis();
         }
 
         // Filter trades by time period
@@ -1995,12 +2383,6 @@ function createResponse(success, message, data = null) {
             document.getElementById('riskRewardRatio').textContent = riskRewardRatio;
             document.getElementById('winRate').textContent = winRate + '%';
             document.getElementById('averageRisk').textContent = formatCurrency(avgRisk);
-
-            // Update daily performance
-            renderDailyPerformance(filteredTrades);
-            
-            // Update session performance
-            renderSessionPerformance(filteredTrades);
             
             // Update recent trades
             renderRecentTrades(filteredTrades);
@@ -2008,121 +2390,6 @@ function createResponse(success, message, data = null) {
 
         function formatCurrency(amount) {
             return '$' + Math.abs(amount).toFixed(2);
-        }
-
-        function renderDailyPerformance(tradesList) {
-            const container = document.getElementById('dailyPerformance');
-            const last7Days = getLast7Days();
-            const dailyStats = {};
-            
-            // Initialize daily stats
-            last7Days.forEach(date => {
-                dailyStats[date] = { profitLoss: 0, trades: 0 };
-            });
-            
-            // Calculate daily stats
-            tradesList.forEach(trade => {
-                if (dailyStats[trade.date]) {
-                    dailyStats[trade.date].profitLoss += trade.profitLoss || 0;
-                    dailyStats[trade.date].trades++;
-                }
-            });
-            
-            // Find best and worst days
-            let bestDay = { date: '', profitLoss: -Infinity };
-            let worstDay = { date: '', profitLoss: Infinity };
-            
-            const dayCards = last7Days.map(date => {
-                const dayStat = dailyStats[date];
-                const dayName = getDayName(date);
-                const profitLoss = dayStat.profitLoss;
-                
-                // Update best/worst days
-                if (profitLoss > bestDay.profitLoss) {
-                    bestDay = { date, profitLoss };
-                }
-                if (profitLoss < worstDay.profitLoss) {
-                    worstDay = { date, profitLoss };
-                }
-                
-                return `
-                    <div class="day-card ${profitLoss >= 0 ? 'profit' : 'loss'}">
-                        <div class="day-name">${dayName}</div>
-                        <div class="day-profit ${profitLoss >= 0 ? 'profit' : 'loss'}">
-                            ${profitLoss >= 0 ? '+' : ''}${formatCurrency(profitLoss)}
-                        </div>
-                        <div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">
-                            ${dayStat.trades} trade${dayStat.trades !== 1 ? 's' : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            container.innerHTML = dayCards;
-            
-            // Update badges
-            document.getElementById('bestDayBadge').textContent = `Best: ${getDayName(bestDay.date)} +${formatCurrency(bestDay.profitLoss)}`;
-            document.getElementById('bestDayBadge').className = 'badge badge-profit';
-            document.getElementById('worstDayBadge').textContent = `Worst: ${getDayName(worstDay.date)} ${formatCurrency(worstDay.profitLoss)}`;
-            document.getElementById('worstDayBadge').className = 'badge badge-loss';
-        }
-
-        function getLast7Days() {
-            const dates = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                dates.push(date.toISOString().split('T')[0]);
-            }
-            return dates;
-        }
-
-        function getDayName(dateString) {
-            const date = new Date(dateString);
-            return DAY_NAMES_SHORT[date.getDay()];
-        }
-
-        function renderSessionPerformance(tradesList) {
-            const container = document.getElementById('sessionPerformance');
-            const sessions = ['Asian', 'European', 'American'];
-            const sessionStats = {};
-            
-            sessions.forEach(session => {
-                sessionStats[session] = {
-                    profitLoss: 0,
-                    wins: 0,
-                    losses: 0,
-                    trades: 0
-                };
-            });
-            
-            tradesList.forEach(trade => {
-                if (sessionStats[trade.session]) {
-                    sessionStats[trade.session].profitLoss += trade.profitLoss || 0;
-                    sessionStats[trade.session].trades++;
-                    if (trade.result === 'Win') sessionStats[trade.session].wins++;
-                    if (trade.result === 'Loss') sessionStats[trade.session].losses++;
-                }
-            });
-            
-            const indicators = sessions.map(session => {
-                const stats = sessionStats[session];
-                const winRate = stats.trades > 0 ? ((stats.wins / stats.trades) * 100).toFixed(0) : 0;
-                
-                return `
-                    <div class="indicator">
-                        <div class="indicator-label">${session}</div>
-                        <div class="indicator-value ${stats.profitLoss >= 0 ? 'profit' : 'loss'}">
-                            ${stats.profitLoss >= 0 ? '+' : ''}${formatCurrency(stats.profitLoss)}
-                        </div>
-                        <div style="font-size: 12px; opacity: 0.7;">
-                            ${stats.trades} trades • ${winRate}% WR
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            container.innerHTML = indicators;
         }
 
         function renderRecentTrades(tradesList) {
@@ -2192,8 +2459,7 @@ function createResponse(success, message, data = null) {
                 session: document.getElementById('sessionFilter').value,
                 result: document.getElementById('resultFilter').value,
                 dateFrom: document.getElementById('dateFromFilter').value,
-                dateTo: document.getElementById('dateToFilter').value,
-                profit: document.getElementById('profitFilter').value
+                dateTo: document.getElementById('dateToFilter').value
             };
 
             let filteredTrades = filterTrades(filters);
@@ -2342,12 +2608,6 @@ function createResponse(success, message, data = null) {
                 filtered = filtered.filter(t => t.date <= filters.dateTo);
             }
             
-            if (filters.profit === 'profit') {
-                filtered = filtered.filter(t => t.profitLoss > 0);
-            } else if (filters.profit === 'loss') {
-                filtered = filtered.filter(t => t.profitLoss < 0);
-            }
-            
             return filtered;
         }
 
@@ -2357,7 +2617,6 @@ function createResponse(success, message, data = null) {
             document.getElementById('resultFilter').value = '';
             document.getElementById('dateFromFilter').value = '';
             document.getElementById('dateToFilter').value = '';
-            document.getElementById('profitFilter').value = '';
             renderJournalTable();
         }
 
@@ -2366,7 +2625,6 @@ function createResponse(success, message, data = null) {
             renderPairAnalysis();
             renderSessionAnalysis();
             renderDayAnalysis();
-            renderTimeAnalysis();
         }
 
         function renderPairAnalysis() {
@@ -2379,20 +2637,12 @@ function createResponse(success, message, data = null) {
                         total: 0, 
                         wins: 0, 
                         losses: 0,
-                        profitLoss: 0,
-                        totalRisk: 0,
-                        totalReward: 0
+                        profitLoss: 0
                     };
                 }
                 pairStats[trade.pair].total++;
-                if (trade.result === 'Win') {
-                    pairStats[trade.pair].wins++;
-                    pairStats[trade.pair].totalReward += parseFloat(trade.rewardAmount) || 0;
-                }
-                if (trade.result === 'Loss') {
-                    pairStats[trade.pair].losses++;
-                    pairStats[trade.pair].totalRisk += parseFloat(trade.riskAmount) || 0;
-                }
+                if (trade.result === 'Win') pairStats[trade.pair].wins++;
+                if (trade.result === 'Loss') pairStats[trade.pair].losses++;
                 pairStats[trade.pair].profitLoss += trade.profitLoss || 0;
             });
 
@@ -2420,16 +2670,12 @@ function createResponse(success, message, data = null) {
                                 <th>Wins</th>
                                 <th>Losses</th>
                                 <th>Win Rate</th>
-                                <th>Total Risk</th>
-                                <th>Total Reward</th>
                                 <th>Profit/Loss</th>
-                                <th>Avg RRR</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${pairs.map(([pair, stats]) => {
                                 const winRate = stats.total > 0 ? ((stats.wins / stats.total) * 100).toFixed(1) : 0;
-                                const avgRRR = stats.totalRisk > 0 ? (stats.totalReward / stats.totalRisk).toFixed(2) : 0;
                                 
                                 return `
                                     <tr>
@@ -2438,12 +2684,9 @@ function createResponse(success, message, data = null) {
                                         <td style="color: var(--success)">${stats.wins}</td>
                                         <td style="color: var(--error)">${stats.losses}</td>
                                         <td><strong>${winRate}%</strong></td>
-                                        <td>${formatCurrency(stats.totalRisk)}</td>
-                                        <td>${formatCurrency(stats.totalReward)}</td>
                                         <td style="color: ${stats.profitLoss >= 0 ? 'var(--profit)' : 'var(--loss)'}; font-weight: 600;">
                                             ${stats.profitLoss >= 0 ? '+' : ''}${formatCurrency(stats.profitLoss)}
                                         </td>
-                                        <td>${avgRRR}</td>
                                     </tr>
                                 `;
                             }).join('')}
@@ -2456,9 +2699,9 @@ function createResponse(success, message, data = null) {
         function renderSessionAnalysis() {
             const container = document.getElementById('sessionAnalysisContainer');
             const sessionStats = {
-                'Asian': { total: 0, wins: 0, losses: 0, profitLoss: 0, totalRisk: 0, totalReward: 0 },
-                'European': { total: 0, wins: 0, losses: 0, profitLoss: 0, totalRisk: 0, totalReward: 0 },
-                'American': { total: 0, wins: 0, losses: 0, profitLoss: 0, totalRisk: 0, totalReward: 0 }
+                'Asian': { total: 0, wins: 0, losses: 0, profitLoss: 0 },
+                'European': { total: 0, wins: 0, losses: 0, profitLoss: 0 },
+                'American': { total: 0, wins: 0, losses: 0, profitLoss: 0 }
             };
 
             trades.forEach(trade => {
@@ -2466,13 +2709,11 @@ function createResponse(success, message, data = null) {
                     sessionStats[trade.session].total++;
                     if (trade.result === 'Win') {
                         sessionStats[trade.session].wins++;
-                        sessionStats[trade.session].totalReward += parseFloat(trade.rewardAmount) || 0;
-                        sessionStats[trade.session].profitLoss += parseFloat(trade.rewardAmount) || 0;
+                        sessionStats[trade.session].profitLoss += trade.profitLoss || 0;
                     }
                     if (trade.result === 'Loss') {
                         sessionStats[trade.session].losses++;
-                        sessionStats[trade.session].totalRisk += parseFloat(trade.riskAmount) || 0;
-                        sessionStats[trade.session].profitLoss -= parseFloat(trade.riskAmount) || 0;
+                        sessionStats[trade.session].profitLoss += trade.profitLoss || 0;
                     }
                 }
             });
@@ -2489,16 +2730,12 @@ function createResponse(success, message, data = null) {
                                 <th>Wins</th>
                                 <th>Losses</th>
                                 <th>Win Rate</th>
-                                <th>Total Risk</th>
-                                <th>Total Reward</th>
                                 <th>Profit/Loss</th>
-                                <th>Avg RRR</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${sessions.map(([session, stats]) => {
                                 const winRate = stats.total > 0 ? ((stats.wins / stats.total) * 100).toFixed(1) : 0;
-                                const avgRRR = stats.totalRisk > 0 ? (stats.totalReward / stats.totalRisk).toFixed(2) : 0;
                                 
                                 return `
                                     <tr>
@@ -2507,12 +2744,9 @@ function createResponse(success, message, data = null) {
                                         <td style="color: var(--success)">${stats.wins}</td>
                                         <td style="color: var(--error)">${stats.losses}</td>
                                         <td><strong>${winRate}%</strong></td>
-                                        <td>${formatCurrency(stats.totalRisk)}</td>
-                                        <td>${formatCurrency(stats.totalReward)}</td>
                                         <td style="color: ${stats.profitLoss >= 0 ? 'var(--profit)' : 'var(--loss)'}; font-weight: 600;">
                                             ${stats.profitLoss >= 0 ? '+' : ''}${formatCurrency(stats.profitLoss)}
                                         </td>
-                                        <td>${avgRRR}</td>
                                     </tr>
                                 `;
                             }).join('')}
@@ -2524,14 +2758,13 @@ function createResponse(success, message, data = null) {
 
         function renderDayAnalysis() {
             const container = document.getElementById('dayAnalysisContainer');
+            const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const dayStats = {};
             
-            // Initialize days
             DAY_NAMES.forEach(day => {
-                dayStats[day] = { total: 0, wins: 0, losses: 0, profitLoss: 0, totalRisk: 0, totalReward: 0 };
+                dayStats[day] = { total: 0, wins: 0, losses: 0, profitLoss: 0 };
             });
             
-            // Calculate stats
             trades.forEach(trade => {
                 const date = new Date(trade.date);
                 const dayName = DAY_NAMES[date.getDay()];
@@ -2540,13 +2773,11 @@ function createResponse(success, message, data = null) {
                 stats.total++;
                 if (trade.result === 'Win') {
                     stats.wins++;
-                    stats.totalReward += parseFloat(trade.rewardAmount) || 0;
-                    stats.profitLoss += parseFloat(trade.rewardAmount) || 0;
+                    stats.profitLoss += trade.profitLoss || 0;
                 }
                 if (trade.result === 'Loss') {
                     stats.losses++;
-                    stats.totalRisk += parseFloat(trade.riskAmount) || 0;
-                    stats.profitLoss -= parseFloat(trade.riskAmount) || 0;
+                    stats.profitLoss += trade.profitLoss || 0;
                 }
             });
             
@@ -2575,16 +2806,12 @@ function createResponse(success, message, data = null) {
                                 <th>Wins</th>
                                 <th>Losses</th>
                                 <th>Win Rate</th>
-                                <th>Total Risk</th>
-                                <th>Total Reward</th>
                                 <th>Profit/Loss</th>
-                                <th>Avg RRR</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${days.map(([day, stats]) => {
                                 const winRate = stats.total > 0 ? ((stats.wins / stats.total) * 100).toFixed(1) : 0;
-                                const avgRRR = stats.totalRisk > 0 ? (stats.totalReward / stats.totalRisk).toFixed(2) : 0;
                                 
                                 return `
                                     <tr>
@@ -2593,76 +2820,14 @@ function createResponse(success, message, data = null) {
                                         <td style="color: var(--success)">${stats.wins}</td>
                                         <td style="color: var(--error)">${stats.losses}</td>
                                         <td><strong>${winRate}%</strong></td>
-                                        <td>${formatCurrency(stats.totalRisk)}</td>
-                                        <td>${formatCurrency(stats.totalReward)}</td>
                                         <td style="color: ${stats.profitLoss >= 0 ? 'var(--profit)' : 'var(--loss)'}; font-weight: 600;">
                                             ${stats.profitLoss >= 0 ? '+' : ''}${formatCurrency(stats.profitLoss)}
                                         </td>
-                                        <td>${avgRRR}</td>
                                     </tr>
                                 `;
                             }).join('')}
                         </tbody>
                     </table>
-                </div>
-            `;
-        }
-
-        function renderTimeAnalysis() {
-            const container = document.getElementById('timeAnalysisContainer');
-            const timeSlots = {
-                'Morning (00:00-08:00)': { total: 0, profitLoss: 0 },
-                'Day (08:00-16:00)': { total: 0, profitLoss: 0 },
-                'Evening (16:00-24:00)': { total: 0, profitLoss: 0 }
-            };
-            
-            trades.forEach(trade => {
-                const hour = parseInt(trade.time.split(':')[0]);
-                let timeSlot;
-                
-                if (hour >= 0 && hour < 8) {
-                    timeSlot = 'Morning (00:00-08:00)';
-                } else if (hour >= 8 && hour < 16) {
-                    timeSlot = 'Day (08:00-16:00)';
-                } else {
-                    timeSlot = 'Evening (16:00-24:00)';
-                }
-                
-                timeSlots[timeSlot].total++;
-                timeSlots[timeSlot].profitLoss += trade.profitLoss || 0;
-            });
-            
-            const slots = Object.entries(timeSlots)
-                .filter(([_, stats]) => stats.total > 0)
-                .sort((a, b) => b[1].profitLoss - a[1].profitLoss);
-            
-            if (slots.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <span class="material-icons">access_time</span>
-                        <h3>No Data Available</h3>
-                        <p>Add trades to see time of day analysis</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = `
-                <div class="performance-indicators">
-                    ${slots.map(([slot, stats]) => `
-                        <div class="indicator">
-                            <div class="indicator-label">${slot.split(' ')[0]}</div>
-                            <div class="indicator-value ${stats.profitLoss >= 0 ? 'profit' : 'loss'}">
-                                ${stats.profitLoss >= 0 ? '+' : ''}${formatCurrency(stats.profitLoss)}
-                            </div>
-                            <div style="font-size: 12px; opacity: 0.7;">
-                                ${stats.total} trade${stats.total !== 1 ? 's' : ''}
-                            </div>
-                            <div style="font-size: 12px; opacity: 0.7;">
-                                ${slot.split('(')[1].split(')')[0]}
-                            </div>
-                        </div>
-                    `).join('')}
                 </div>
             `;
         }
@@ -2675,12 +2840,6 @@ function createResponse(success, message, data = null) {
             let totalRisk = 0;
             let totalReward = 0;
             let netProfitLoss = 0;
-            let bestRRR = 0;
-            let worstRRR = 0;
-            let largestWin = 0;
-            let largestLoss = 0;
-            let winCount = 0;
-            let lossCount = 0;
             
             filteredTrades.forEach(trade => {
                 const risk = parseFloat(trade.riskAmount) || 0;
@@ -2690,26 +2849,11 @@ function createResponse(success, message, data = null) {
                 totalRisk += risk;
                 if (trade.result === 'Win') {
                     totalReward += reward;
-                    winCount++;
-                } else if (trade.result === 'Loss') {
-                    lossCount++;
                 }
-                
                 netProfitLoss += profitLoss;
-                
-                if (risk > 0 && reward > 0) {
-                    const rrr = reward / risk;
-                    if (rrr > bestRRR) bestRRR = rrr;
-                    if (worstRRR === 0 || rrr < worstRRR) worstRRR = rrr;
-                }
-                
-                if (profitLoss > largestWin) largestWin = profitLoss;
-                if (profitLoss < largestLoss) largestLoss = profitLoss;
             });
             
             const riskRewardRatio = totalRisk > 0 ? (totalReward / totalRisk).toFixed(2) : 0;
-            const avgRiskPerTrade = filteredTrades.length > 0 ? totalRisk / filteredTrades.length : 0;
-            const avgRewardPerTrade = winCount > 0 ? totalReward / winCount : 0;
             
             // Update UI
             document.getElementById('totalRisk').textContent = formatCurrency(totalRisk);
@@ -2718,25 +2862,8 @@ function createResponse(success, message, data = null) {
             document.getElementById('netProfitLossRisk').className = `stat-value ${netProfitLoss >= 0 ? 'profit' : 'loss'}`;
             document.getElementById('riskRewardRatioRisk').textContent = riskRewardRatio;
             
-            document.getElementById('bestRRR').textContent = `Best RRR: ${bestRRR.toFixed(2)}`;
-            document.getElementById('worstRRR').textContent = `Worst RRR: ${worstRRR.toFixed(2)}`;
-            
-            document.getElementById('avgRiskPerTrade').textContent = formatCurrency(avgRiskPerTrade);
-            document.getElementById('avgRewardPerTrade').textContent = formatCurrency(avgRewardPerTrade);
-            document.getElementById('largestWin').textContent = formatCurrency(largestWin);
-            document.getElementById('largestLoss').textContent = formatCurrency(largestLoss);
-            
             // Render risk/reward distribution
             renderRiskRewardDistribution(filteredTrades);
-            
-            // Render monthly trend
-            renderMonthlyTrend(filteredTrades);
-            
-            // Render session profit/loss
-            renderSessionProfitLoss();
-            
-            // Render risk analysis indicators
-            renderRiskIndicators(filteredTrades, winCount, lossCount);
         }
 
         function renderRiskRewardDistribution(tradesList) {
@@ -2786,152 +2913,50 @@ function createResponse(success, message, data = null) {
             container.innerHTML = indicators;
         }
 
-        function renderMonthlyTrend(tradesList) {
-            const container = document.getElementById('monthlyTrendContainer');
-            const monthlyStats = {};
+        // Users List
+        function renderUsersList(users) {
+            const container = document.getElementById('usersListContainer');
             
-            tradesList.forEach(trade => {
-                const date = new Date(trade.date);
-                const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                
-                if (!monthlyStats[monthYear]) {
-                    monthlyStats[monthYear] = { profitLoss: 0, trades: 0 };
-                }
-                
-                monthlyStats[monthYear].profitLoss += trade.profitLoss || 0;
-                monthlyStats[monthYear].trades++;
-            });
-            
-            const months = Object.entries(monthlyStats)
-                .sort((a, b) => a[0].localeCompare(b[0]))
-                .slice(-6); // Last 6 months
-            
-            if (months.length === 0) {
+            if (users.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state" style="padding: 40px 20px;">
-                        <span class="material-icons">timeline</span>
-                        <h3>No Monthly Data</h3>
-                        <p>Add more trades to see monthly trends</p>
+                    <div class="empty-state">
+                        <span class="material-icons">group_off</span>
+                        <h3>No Users Found</h3>
+                        <p>No users have registered yet</p>
                     </div>
                 `;
                 return;
             }
-            
-            const maxProfitLoss = Math.max(...months.map(([_, stats]) => Math.abs(stats.profitLoss)));
-            
+
             container.innerHTML = `
-                <div style="display: flex; align-items: flex-end; height: 200px; gap: 20px; padding: 20px 0; border-top: 1px solid var(--border-light);">
-                    ${months.map(([month, stats]) => {
-                        const monthName = new Date(month + '-01').toLocaleDateString('en-US', { month: 'short' });
-                        const height = maxProfitLoss > 0 ? (Math.abs(stats.profitLoss) / maxProfitLoss * 150) : 0;
-                        const isProfit = stats.profitLoss >= 0;
+                <div class="user-list">
+                    ${users.map(user => {
+                        const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                        const isCurrentUser = currentUser && user.userId === currentUser.userId;
                         
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-                                <div style="font-size: 12px; opacity: 0.7; margin-bottom: 8px;">${monthName}</div>
-                                <div style="width: 40px; height: ${height}px; background: ${isProfit ? 'var(--profit)' : 'var(--loss)'}; 
-                                     border-radius: 4px 4px 0 0; position: relative;">
-                                    <div style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); 
-                                         white-space: nowrap; font-size: 12px; font-weight: 600; color: ${isProfit ? 'var(--profit)' : 'var(--loss)'};">
-                                        ${isProfit ? '+' : ''}${formatCurrency(stats.profitLoss)}
+                            <div class="user-card ${isCurrentUser ? 'current-user' : ''}" style="${isCurrentUser ? 'border: 2px solid var(--primary);' : ''}">
+                                <div class="user-card-avatar">${initials.slice(0, 2)}</div>
+                                <div class="user-card-info">
+                                    <div class="user-card-name">
+                                        ${user.name}
+                                        ${isCurrentUser ? '<span style="font-size: 12px; color: var(--primary); margin-left: 8px;">(You)</span>' : ''}
+                                    </div>
+                                    <div class="user-card-email">${user.email}</div>
+                                    <div class="user-card-stats">
+                                        <div class="user-card-stat">
+                                            <span class="material-icons" style="font-size: 14px;">bar_chart</span>
+                                            ${user.tradeCount} trades
+                                        </div>
+                                        <div class="user-card-stat">
+                                            <span class="material-icons" style="font-size: 14px;">calendar_today</span>
+                                            ${formatDateShort(user.createdAt)}
+                                        </div>
                                     </div>
                                 </div>
-                                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">${stats.trades} trades</div>
                             </div>
                         `;
                     }).join('')}
-                </div>
-            `;
-        }
-
-        function renderSessionProfitLoss() {
-            const container = document.getElementById('sessionProfitLossContainer');
-            const period = document.getElementById('sessionTimeFilter').value;
-            const filteredTrades = filterTradesByPeriod(trades, period);
-            
-            const sessionStats = {
-                'Asian': { profitLoss: 0, wins: 0, losses: 0 },
-                'European': { profitLoss: 0, wins: 0, losses: 0 },
-                'American': { profitLoss: 0, wins: 0, losses: 0 }
-            };
-            
-            filteredTrades.forEach(trade => {
-                if (sessionStats[trade.session]) {
-                    sessionStats[trade.session].profitLoss += trade.profitLoss || 0;
-                    if (trade.result === 'Win') sessionStats[trade.session].wins++;
-                    if (trade.result === 'Loss') sessionStats[trade.session].losses++;
-                }
-            });
-            
-            const sessions = Object.entries(sessionStats)
-                .sort((a, b) => b[1].profitLoss - a[1].profitLoss);
-            
-            container.innerHTML = `
-                <div class="performance-indicators">
-                    ${sessions.map(([session, stats]) => {
-                        const totalTrades = stats.wins + stats.losses;
-                        const winRate = totalTrades > 0 ? ((stats.wins / totalTrades) * 100).toFixed(0) : 0;
-                        
-                        return `
-                            <div class="indicator">
-                                <div class="indicator-label">${session}</div>
-                                <div class="indicator-value ${stats.profitLoss >= 0 ? 'profit' : 'loss'}">
-                                    ${stats.profitLoss >= 0 ? '+' : ''}${formatCurrency(stats.profitLoss)}
-                                </div>
-                                <div style="font-size: 12px; opacity: 0.7;">
-                                    ${stats.wins}W ${stats.losses}L • ${winRate}% WR
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-
-        function renderRiskIndicators(tradesList, winCount, lossCount) {
-            const container = document.getElementById('riskAnalysis');
-            
-            const totalTrades = tradesList.length;
-            const winRate = totalTrades > 0 ? ((winCount / totalTrades) * 100).toFixed(1) : 0;
-            
-            // Calculate average win/loss
-            let totalWinAmount = 0;
-            let totalLossAmount = 0;
-            
-            tradesList.forEach(trade => {
-                if (trade.result === 'Win') {
-                    totalWinAmount += parseFloat(trade.rewardAmount) || 0;
-                } else if (trade.result === 'Loss') {
-                    totalLossAmount += parseFloat(trade.riskAmount) || 0;
-                }
-            });
-            
-            const avgWin = winCount > 0 ? totalWinAmount / winCount : 0;
-            const avgLoss = lossCount > 0 ? totalLossAmount / lossCount : 0;
-            const expectancy = (avgWin * (winCount / totalTrades)) - (avgLoss * (lossCount / totalTrades));
-            
-            container.innerHTML = `
-                <div class="indicator">
-                    <div class="indicator-label">Expectancy</div>
-                    <div class="indicator-value ${expectancy >= 0 ? 'profit' : 'loss'}">
-                        ${expectancy >= 0 ? '+' : ''}${formatCurrency(expectancy)}
-                    </div>
-                    <div style="font-size: 12px; opacity: 0.7;">Per trade</div>
-                </div>
-                <div class="indicator">
-                    <div class="indicator-label">Win/Loss Ratio</div>
-                    <div class="indicator-value">${winCount}:${lossCount}</div>
-                    <div style="font-size: 12px; opacity: 0.7;">${winRate}% Win Rate</div>
-                </div>
-                <div class="indicator">
-                    <div class="indicator-label">Avg Win</div>
-                    <div class="indicator-value profit">${formatCurrency(avgWin)}</div>
-                    <div style="font-size: 12px; opacity: 0.7;">Per winning trade</div>
-                </div>
-                <div class="indicator">
-                    <div class="indicator-label">Avg Loss</div>
-                    <div class="indicator-value loss">${formatCurrency(avgLoss)}</div>
-                    <div style="font-size: 12px; opacity: 0.7;">Per losing trade</div>
                 </div>
             `;
         }
@@ -2944,14 +2969,14 @@ function createResponse(success, message, data = null) {
         async function deleteTrade(id) {
             if (!confirm('Are you sure you want to delete this trade?')) return;
 
-            await deleteTradeFromCloud(id);
-            trades = trades.filter(t => t.id !== id);
-            
-            showToast('Trade deleted successfully!', 'success');
-            updateDashboard();
-            renderJournalTable();
-            renderAnalysis();
-            renderRiskAnalysis();
+            const cloudResult = await deleteTradeFromCloud(id);
+            if (cloudResult !== false) {
+                trades = trades.filter(t => t.id !== id);
+                showToast('Trade deleted successfully!', 'success');
+                updateDashboard();
+                renderJournalTable();
+                renderAnalysis();
+            }
         }
 
         // Utility Functions
@@ -2959,6 +2984,11 @@ function createResponse(success, message, data = null) {
             const date = new Date(dateString);
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             return `${days[date.getDay()]}, ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        }
+
+        function formatDateShort(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
         function getResultColor(result) {
