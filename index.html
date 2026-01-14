@@ -3,1479 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-User Trading Journal - Cloud Sync</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>Trading Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        /* All CSS remains the same as your original - no changes needed */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #3B82F6; --success: #34D399; --error: #EF4444;
-            --warning: #F59E0B; --profit: #10B981; --loss: #EF4444;
-            --neutral: #6B7280; --bg-light: #F8FAFC; --bg-dark: #1E293B;
-            --text-light: #1F2937; --text-dark: #F1F5F9; --card-light: #FFFFFF;
-            --card-dark: #334155; --border-light: #E2E8F0; --border-dark: #475569;
+            --primary: #3B82F6;
+            --success: #10B981;
+            --error: #EF4444;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --text: #1F2937;
+            --border: #E2E8F0;
         }
-        body { font-family: 'Roboto Mono', monospace; background: var(--bg-light); color: var(--text-light); transition: all 0.3s ease; }
-        body.dark-mode { background: var(--bg-dark); color: var(--text-dark); }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        
-        /* Add these new styles for password strength indicator */
-        .password-strength {
-            margin-top: 8px;
-            height: 4px;
-            border-radius: 2px;
-            background: var(--border-light);
-            overflow: hidden;
-        }
-        .password-strength-bar {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-        .password-strength.weak .password-strength-bar { 
-            width: 33%; 
-            background: var(--error); 
-        }
-        .password-strength.medium .password-strength-bar { 
-            width: 66%; 
-            background: var(--warning); 
-        }
-        .password-strength.strong .password-strength-bar { 
-            width: 100%; 
-            background: var(--success); 
-        }
-        
-        /* Add for loading states */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-light);
-            border-top: 2px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Rest of your CSS remains exactly the same */
-        .login-container { max-width: 400px; margin: 100px auto; padding: 40px; background: var(--card-light); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        body.dark-mode .login-container { background: var(--card-dark); }
-        .login-container h1 { text-align: center; margin-bottom: 30px; color: var(--primary); }
-        .user-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
-        .app-container { display: none; }
-        .app-container.active { display: block; }
-        header { background: var(--card-light); padding: 20px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
-        body.dark-mode header { background: var(--card-dark); }
-        h1 { font-family: 'Poppins', sans-serif; font-size: 28px; color: var(--primary); display: flex; align-items: center; gap: 12px; }
-        .header-controls { display: flex; gap: 12px; align-items: center; }
-        .user-info { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: rgba(59, 130, 246, 0.1); border-radius: 20px; color: var(--primary); font-weight: 500; }
-        .user-avatar-small { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .sync-status { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .sync-status.connected { background: rgba(52, 211, 153, 0.1); color: var(--success); }
-        .sync-status.disconnected { background: rgba(239, 68, 68, 0.1); color: var(--error); }
-        .sync-status .material-icons { font-size: 16px; }
-        nav { background: var(--card-light); padding: 16px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s ease; }
-        body.dark-mode nav { background: var(--card-dark); }
-        .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-        .nav-tab { padding: 12px 24px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 500; color: var(--text-light); transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
-        body.dark-mode .nav-tab { color: var(--text-dark); }
-        .nav-tab:hover { background: rgba(59, 130, 246, 0.1); }
-        .nav-tab.active { background: var(--primary); color: white; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #2563EB; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #10B981; transform: translateY(-2px); }
-        .btn-warning { background: var(--warning); color: white; }
-        .btn-danger { background: var(--error); color: white; }
-        .btn-danger:hover { background: #DC2626; transform: translateY(-2px); }
-        .btn-secondary { background: var(--border-light); color: var(--text-light); }
-        body.dark-mode .btn-secondary { background: var(--border-dark); color: var(--text-dark); }
-        .btn-icon { padding: 8px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: var(--card-light); border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; transition: all 0.3s ease; }
-        body.dark-mode .card { background: var(--card-dark); }
-        .card h2 { font-family: 'Poppins', sans-serif; font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 24px; }
-        .stat-card { background: var(--card-light); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s ease; position: relative; overflow: hidden; }
-        body.dark-mode .stat-card { background: var(--card-dark); }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
-        .stat-label { font-size: 12px; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
-        .stat-value { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; }
-        .profit { color: var(--profit); }
-        .loss { color: var(--loss); }
-        .neutral { color: var(--neutral); }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .login-box { max-width: 400px; margin: 100px auto; padding: 40px; background: var(--card); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .login-box h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 2px solid var(--border-light); border-radius: 8px; font-family: 'Roboto Mono', monospace; font-size: 14px; transition: all 0.3s ease; background: var(--card-light); color: var(--text-light); }
-        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: var(--bg-dark); border-color: var(--border-dark); color: var(--text-dark); }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .table-container { overflow-x: auto; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; background: var(--card-light); }
-        body.dark-mode table { background: var(--card-dark); }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; justify-content: center; }
+        .btn-primary:hover { background: #2563EB; transform: translateY(-2px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--error); color: white; }
+        .app { display: none; }
+        .app.active { display: block; }
+        .header { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .header h1 { font-size: 24px; color: var(--primary); }
+        .header-controls { display: flex; gap: 12px; flex-wrap: wrap; }
+        .user-badge { padding: 8px 16px; background: rgba(59,130,246,0.1); border-radius: 20px; color: var(--primary); font-size: 14px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-label { font-size: 12px; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
+        .stat-value { font-size: 32px; font-weight: 700; }
+        .profit { color: var(--success); }
+        .loss { color: var(--error); }
+        .card { background: var(--card); padding: 24px; border-radius: 12px; margin-bottom: 20px; }
+        .card h2 { margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        table { width: 100%; border-collapse: collapse; }
         thead { background: var(--primary); color: white; }
-        th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-light); }
-        body.dark-mode th, body.dark-mode td { border-bottom-color: var(--border-dark); }
-        tbody tr { transition: all 0.2s ease; }
-        tbody tr:hover { background: rgba(59, 130, 246, 0.05); }
-        .action-buttons { display: flex; gap: 8px; }
-        .btn-icon-small { padding: 6px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; background: transparent; color: var(--text-light); }
-        body.dark-mode .btn-icon-small { color: var(--text-dark); }
-        .btn-icon-small:hover { background: var(--border-light); }
-        body.dark-mode .btn-icon-small:hover { background: var(--border-dark); }
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        tbody tr:hover { background: rgba(59,130,246,0.05); }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--card-light); border-radius: 16px; padding: 32px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
-        body.dark-mode .modal-content { background: var(--card-dark); }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content { background: var(--card); border-radius: 16px; padding: 32px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-header h3 { font-family: 'Poppins', sans-serif; font-size: 24px; }
-        .toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; display: flex; align-items: center; gap: 12px; animation: slideInRight 0.3s ease; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        @keyframes slideInRight { from { transform: translateX(400px); } to { transform: translateX(0); } }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; display: flex; align-items: center; gap: 12px; z-index: 2000; animation: slideIn 0.3s; }
+        @keyframes slideIn { from { transform: translateX(400px); } to { transform: translateX(0); } }
         .toast.success { background: var(--success); }
         .toast.error { background: var(--error); }
-        .toast.warning { background: var(--warning); }
-        .user-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .user-card { background: var(--card-light); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; transition: all 0.3s ease; }
-        body.dark-mode .user-card { background: var(--card-dark); }
-        .user-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
-        .user-card-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-        .user-card-info { flex: 1; }
-        .user-card-name { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 18px; margin-bottom: 4px; }
-        .user-card-email { font-size: 12px; opacity: 0.7; margin-bottom: 8px; }
-        .user-card-stats { display: flex; gap: 12px; font-size: 12px; }
-        .user-card-stat { display: flex; align-items: center; gap: 4px; }
-        .filters { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
-        .filter-group { flex: 1; min-width: 150px; }
-        .filter-group label { margin-bottom: 4px; font-size: 12px; opacity: 0.8; }
-        .admin-controls { background: rgba(245, 158, 11, 0.1); border: 2px solid var(--warning); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .admin-controls h3 { color: var(--warning); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .performance-indicators { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .indicator { background: var(--card-light); border-radius: 8px; padding: 15px; text-align: center; transition: all 0.3s ease; }
-        body.dark-mode .indicator { background: var(--card-dark); }
-        .indicator:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .indicator-value { font-size: 24px; font-weight: 700; font-family: 'Poppins', sans-serif; margin: 5px 0; }
-        .indicator-label { font-size: 12px; opacity: 0.7; text-transform: uppercase; }
-        .time-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .time-filter-btn { padding: 8px 16px; border: none; border-radius: 20px; background: var(--border-light); color: var(--text-light); cursor: pointer; font-size: 14px; transition: all 0.3s ease; }
-        body.dark-mode .time-filter-btn { background: var(--border-dark); color: var(--text-dark); }
-        .time-filter-btn.active { background: var(--primary); color: white; }
-        .time-filter-btn:hover { background: var(--primary); color: white; }
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state .material-icons { font-size: 80px; opacity: 0.3; margin-bottom: 16px; }
-        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 20px; margin-bottom: 8px; }
-        .empty-state p { opacity: 0.7; margin-bottom: 20px; }
-        
+        .empty { text-align: center; padding: 60px 20px; opacity: 0.5; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; border: none; background: transparent; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .tab:hover { background: rgba(59,130,246,0.1); }
+        .tab.active { background: var(--primary); color: white; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .action-btn { padding: 6px; border: none; background: transparent; cursor: pointer; border-radius: 6px; }
+        .action-btn:hover { background: var(--border); }
         @media (max-width: 768px) {
-            h1 { font-size: 20px; }
+            .stats { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .filters { flex-direction: column; }
-            .header-controls { flex-wrap: wrap; }
-            .performance-indicators { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 480px) {
-            .performance-indicators { grid-template-columns: 1fr; }
-            .user-list { grid-template-columns: 1fr; }
+            .header { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
     <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="user-avatar">
-            <span class="material-icons">account_circle</span>
-        </div>
-        <h1>Multi-User Trading Journal</h1>
-        
+    <div id="loginPage" class="login-box">
+        <h1>📊 Trading Journal</h1>
         <div class="form-group">
-            <label for="userEmail">Email Address</label>
-            <input type="email" id="userEmail" placeholder="your.email@example.com" required>
+            <label>Email</label>
+            <input type="email" id="email" placeholder="your@email.com">
         </div>
-        
         <div class="form-group">
-            <label for="userName">Display Name</label>
-            <input type="text" id="userName" placeholder="John Trader" required>
+            <label>Name</label>
+            <input type="text" id="name" placeholder="Your Name">
         </div>
-        
         <div class="form-group">
-            <label for="userPassword">Password (min. 8 characters)</label>
-            <input type="password" id="userPassword" placeholder="••••••••" required minlength="8">
-            <div id="passwordStrength" class="password-strength">
-                <div class="password-strength-bar"></div>
-            </div>
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••">
         </div>
-        
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
+        <button class="btn btn-primary" onclick="login()">
             <span class="material-icons">login</span>
-            <span id="loginText">Login / Register</span>
+            Login / Register
         </button>
-        
-        <p style="text-align: center; font-size: 12px; opacity: 0.7;">
-            First time users will be automatically registered
+        <p style="text-align: center; font-size: 12px; margin-top: 16px; opacity: 0.6;">
+            First time? You'll be registered automatically
         </p>
     </div>
 
     <!-- Main App -->
-    <div id="appContainer" class="app-container">
+    <div id="app" class="app">
         <div class="container">
-            <header>
-                <h1>
-                    <span class="material-icons">analytics</span>
-                    Multi-User Trading Journal
-                </h1>
+            <div class="header">
+                <h1>📊 Trading Journal</h1>
                 <div class="header-controls">
-                    <div class="user-info" id="currentUserInfo">
-                        <div class="user-avatar-small" id="userAvatarSmall">U</div>
-                        <span id="userDisplayName">User</span>
-                    </div>
-                    <div class="sync-status disconnected" id="syncStatus">
-                        <span class="material-icons">cloud_off</span>
-                        <span>Not Connected</span>
-                    </div>
-                    <button class="btn btn-icon btn-secondary" id="themeToggle">
-                        <span class="material-icons">dark_mode</span>
-                    </button>
-                    <button class="btn btn-primary" id="addTradeBtn">
+                    <div class="user-badge" id="userBadge">User</div>
+                    <button class="btn btn-primary" onclick="openAddModal()">
                         <span class="material-icons">add</span>
                         Add Trade
                     </button>
-                </div>
-            </header>
-
-            <nav>
-                <div class="nav-tabs">
-                    <button class="nav-tab active" data-page="dashboard">
-                        <span class="material-icons">dashboard</span>
-                        Dashboard
+                    <button class="btn btn-success" onclick="syncTrades()">
+                        <span class="material-icons">sync</span>
+                        Sync
                     </button>
-                    <button class="nav-tab" data-page="journal">
-                        <span class="material-icons">book</span>
-                        Journal
-                    </button>
-                    <button class="nav-tab" data-page="analysis">
-                        <span class="material-icons">insights</span>
-                        Analysis
-                    </button>
-                    <button class="nav-tab" data-page="risk">
-                        <span class="material-icons">security</span>
-                        Risk/Reward
-                    </button>
-                    <button class="nav-tab" data-page="users" id="usersTab">
-                        <span class="material-icons">group</span>
-                        Users
-                    </button>
-                    <button class="nav-tab" data-page="settings">
-                        <span class="material-icons">settings</span>
-                        Settings
-                    </button>
-                    <button class="btn btn-danger" id="logoutBtn" style="margin-left: auto;">
+                    <button class="btn btn-danger" onclick="logout()">
                         <span class="material-icons">logout</span>
                         Logout
                     </button>
                 </div>
-            </nav>
+            </div>
 
-            <main>
-                <!-- Dashboard Page -->
-                <div id="dashboard" class="page active">
-                    <div class="time-filters">
-                        <button class="time-filter-btn active" data-period="all">All Time</button>
-                        <button class="time-filter-btn" data-period="today">Today</button>
-                        <button class="time-filter-btn" data-period="week">This Week</button>
-                        <button class="time-filter-btn" data-period="month">This Month</button>
-                        <button class="time-filter-btn" data-period="year">This Year</button>
+            <div class="tabs">
+                <button class="tab active" onclick="showPage('dashboard')">Dashboard</button>
+                <button class="tab" onclick="showPage('journal')">Journal</button>
+                <button class="tab" onclick="showPage('settings')">Settings</button>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="page active">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total P/L</div>
+                        <div class="stat-value" id="totalPL">$0.00</div>
                     </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Total Profit/Loss</div>
-                            <div class="stat-value" id="totalProfitLoss">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Risk/Reward Ratio</div>
-                            <div class="stat-value" id="riskRewardRatio">0.00</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Win Rate</div>
-                            <div class="stat-value" id="winRate">0%</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Average Risk</div>
-                            <div class="stat-value" id="averageRisk">$0</div>
-                        </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value" id="winRate">0%</div>
                     </div>
-
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <h2 style="margin: 0;">
-                                <span class="material-icons">bar_chart</span>
-                                Recent Trades
-                            </h2>
-                            <button class="btn btn-success" id="syncBtn">
-                                <span class="material-icons">sync</span>
-                                Sync from Cloud
-                            </button>
-                        </div>
-                        <div id="recentTradesContainer"></div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Trades</div>
+                        <div class="stat-value" id="totalTrades">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Risk/Reward</div>
+                        <div class="stat-value" id="rrRatio">0.00</div>
                     </div>
                 </div>
-
-                <!-- Journal Page -->
-                <div id="journal" class="page">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">filter_list</span>
-                            Filters
-                        </h2>
-                        <div class="filters">
-                            <div class="filter-group">
-                                <label>Search</label>
-                                <input type="text" id="searchFilter" placeholder="Search by pair or notes...">
-                            </div>
-                            <div class="filter-group">
-                                <label>Session</label>
-                                <select id="sessionFilter">
-                                    <option value="">All Sessions</option>
-                                    <option value="Asian">Asian</option>
-                                    <option value="European">European</option>
-                                    <option value="American">American</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Result</label>
-                                <select id="resultFilter">
-                                    <option value="">All Results</option>
-                                    <option value="Win">Win</option>
-                                    <option value="Loss">Loss</option>
-                                    <option value="Breakeven">Breakeven</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Date Range</label>
-                                <input type="date" id="dateFromFilter">
-                                <input type="date" id="dateToFilter" style="margin-top: 4px;">
-                            </div>
-                            <button class="btn btn-secondary" id="clearFilters">
-                                <span class="material-icons">clear</span>
-                                Clear All
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <h2 style="margin: 0;">
-                                <span class="material-icons">table_chart</span>
-                                All Trades
-                                <span class="badge" id="tradeCountBadge">0 trades</span>
-                            </h2>
-                            <div>
-                                <button class="btn btn-danger" id="deleteAllBtn" style="margin-right: 12px;">
-                                    <span class="material-icons">delete_sweep</span>
-                                    Delete All My Trades
-                                </button>
-                                <button class="btn btn-warning" id="refreshBtn">
-                                    <span class="material-icons">refresh</span>
-                                    Refresh from Cloud
-                                </button>
-                            </div>
-                        </div>
-                        <div id="journalTableContainer"></div>
-                    </div>
+                <div class="card">
+                    <h2>Recent Trades</h2>
+                    <div id="recentTrades"></div>
                 </div>
+            </div>
 
-                <!-- Analysis Page -->
-                <div id="analysis" class="page">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">pie_chart</span>
-                            Performance by Pair
-                        </h2>
-                        <div id="pairAnalysisContainer"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">schedule</span>
-                            Performance by Session
-                        </h2>
-                        <div id="sessionAnalysisContainer"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">calendar_today</span>
-                            Performance by Day of Week
-                        </h2>
-                        <div id="dayAnalysisContainer"></div>
-                    </div>
+            <!-- Journal -->
+            <div id="journal" class="page">
+                <div class="card">
+                    <h2>All Trades</h2>
+                    <div id="allTrades"></div>
                 </div>
+            </div>
 
-                <!-- Risk/Reward Page -->
-                <div id="risk" class="page">
-                    <div class="time-filters">
-                        <button class="time-filter-btn active" data-period="all">All Time</button>
-                        <button class="time-filter-btn" data-period="week">This Week</button>
-                        <button class="time-filter-btn" data-period="month">This Month</button>
-                        <button class="time-filter-btn" data-period="year">This Year</button>
+            <!-- Settings -->
+            <div id="settings" class="page">
+                <div class="card">
+                    <h2>Google Apps Script URL</h2>
+                    <div class="form-group">
+                        <label>Deployment URL</label>
+                        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_ID/exec">
                     </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Total Risk</div>
-                            <div class="stat-value" id="totalRisk">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Total Reward</div>
-                            <div class="stat-value" id="totalReward">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Net Profit/Loss</div>
-                            <div class="stat-value" id="netProfitLossRisk">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Risk/Reward Ratio</div>
-                            <div class="stat-value" id="riskRewardRatioRisk">0.00</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">show_chart</span>
-                            Risk/Reward Distribution
-                        </h2>
-                        <div class="performance-indicators" id="riskRewardDistribution"></div>
-                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                    <button class="btn btn-success" onclick="testConnection()" style="margin-left: 10px;">Test Connection</button>
                 </div>
-
-                <!-- Users Page -->
-                <div id="users" class="page">
-                    <div class="admin-controls" id="adminControls" style="display: none;">
-                        <h3>
-                            <span class="material-icons">admin_panel_settings</span>
-                            Admin Controls
-                        </h3>
-                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <button class="btn btn-danger" id="deleteAllUsersDataBtn">
-                                <span class="material-icons">delete_forever</span>
-                                Delete All Users Data from Cloud
-                            </button>
-                            <button class="btn btn-warning" id="syncAllUsersBtn">
-                                <span class="material-icons">sync_all</span>
-                                Sync All Users Data
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">group</span>
-                            Registered Users
-                        </h2>
-                        <div id="usersListContainer"></div>
-                    </div>
+                <div class="card">
+                    <h2>Danger Zone</h2>
+                    <button class="btn btn-danger" onclick="deleteAllTrades()">Delete All My Trades</button>
                 </div>
-
-                <!-- Settings Page -->
-                <div id="settings" class="page">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">cloud</span>
-                            Cloud Settings
-                        </h2>
-                        <div class="form-group">
-                            <label for="scriptUrl">Google Apps Script Deployment URL</label>
-                            <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
-                        </div>
-                        <div class="form-group">
-                            <label for="adminPassword">Admin Password (for cloud management)</label>
-                            <input type="password" id="adminPassword" placeholder="Enter admin password">
-                        </div>
-                        <button class="btn btn-success" id="saveSettingsBtn">
-                            <span class="material-icons">save</span>
-                            Save Settings
-                        </button>
-                        <button class="btn btn-warning" id="testConnectionBtn" style="margin-left: 12px;">
-                            <span class="material-icons">sync</span>
-                            Test Connection
-                        </button>
-                    </div>
-
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">code</span>
-                            Google Apps Script Code
-                        </h2>
-                        <p>Copy this code to your Google Apps Script editor:</p>
-                        <div style="background: var(--border-light); padding: 16px; border-radius: 8px; margin-bottom: 16px; overflow-x: auto;">
-                            <pre style="margin: 0; font-family: 'Roboto Mono', monospace; font-size: 12px; white-space: pre-wrap;">
-// Multi-User Trading Journal - Google Apps Script
-// This script handles multi-user data separation
-
-const SHEET_NAME = 'UsersData';
-const ADMIN_PASSWORD = 'admin123'; // CHANGE THIS TO YOUR SECURE PASSWORD
-
-// Rate limiting cache
-const RATE_LIMIT = {
-  maxRequests: 20,
-  timeWindow: 60000 // 1 minute
-};
-
-// Initialize spreadsheet - ALWAYS RUN THIS FIRST
-function initializeSheets() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  // Create UsersData sheet if it doesn't exist
-  let usersSheet = ss.getSheetByName(SHEET_NAME);
-  if (!usersSheet) {
-    usersSheet = ss.insertSheet(SHEET_NAME);
-    // Add headers
-    usersSheet.appendRow(['User ID', 'Email', 'Name', 'Password Hash', 'Salt', 'Created At', 'Last Login']);
-    
-    // Format header row
-    const headerRange = usersSheet.getRange(1, 1, 1, 7);
-    headerRange.setBackground('#4a86e8')
-      .setFontColor('white')
-      .setFontWeight('bold');
-    
-    // Set column widths
-    usersSheet.setColumnWidth(1, 200); // User ID
-    usersSheet.setColumnWidth(2, 200); // Email
-    usersSheet.setColumnWidth(3, 150); // Name
-    usersSheet.setColumnWidth(4, 250); // Password Hash
-    usersSheet.setColumnWidth(5, 150); // Salt
-    usersSheet.setColumnWidth(6, 150); // Created At
-    usersSheet.setColumnWidth(7, 150); // Last Login
-    
-    console.log('✅ Created UsersData sheet');
-  } else {
-    console.log('✅ UsersData sheet already exists');
-  }
-  
-  return usersSheet;
-}
-
-// Initialize GET request
-function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({
-    status: 'success',
-    message: 'Multi-User Trading Journal API is ready',
-    version: '2.1',
-    timestamp: new Date().toISOString()
-  })).setMimeType(ContentService.MimeType.JSON);
-}
-
-// Handle POST requests
-function doPost(e) {
-  try {
-    // Check rate limit first
-    const ip = e.parameter ? e.parameter.ip : '';
-    if (!checkRateLimit(ip)) {
-      return createResponse(false, 'Rate limit exceeded. Please wait.', null, 429);
-    }
-    
-    // Parse request data
-    const data = JSON.parse(e.postData.contents);
-    const action = data.action;
-    
-    console.log('Action requested:', action);
-    
-    // Validate action
-    if (!action) {
-      return createResponse(false, 'No action specified');
-    }
-    
-    // Initialize sheets FIRST
-    initializeSheets();
-    
-    // Handle actions
-    switch(action) {
-      case 'login':
-        return loginUser(data.email, data.password, data.name);
-      case 'addTrade':
-        validateUserId(data.userId);
-        validateTrade(data.trade);
-        return addTrade(data.userId, data.trade);
-      case 'getUserTrades':
-        validateUserId(data.userId);
-        return getUserTrades(data.userId);
-      case 'updateTrade':
-        validateUserId(data.userId);
-        validateTradeId(data.tradeId);
-        validateTrade(data.trade);
-        return updateTrade(data.userId, data.tradeId, data.trade);
-      case 'deleteTrade':
-        validateUserId(data.userId);
-        validateTradeId(data.tradeId);
-        return deleteTrade(data.userId, data.tradeId);
-      case 'deleteAllUserTrades':
-        validateUserId(data.userId);
-        return deleteAllUserTrades(data.userId);
-      case 'uploadScreenshot':
-        validateUserId(data.userId);
-        return uploadScreenshot(data.userId, data.screenshot, data.filename);
-      case 'getAllUsers':
-        return getAllUsers();
-      case 'deleteAllUsersData':
-        return deleteAllUsersData(data.adminPassword);
-      case 'getUserStats':
-        validateUserId(data.userId);
-        return getUserStats(data.userId);
-      case 'testConnection':
-        return createResponse(true, 'Connection successful - Sheets initialized');
-      default:
-        return createResponse(false, 'Unknown action: ' + action);
-    }
-  } catch(error) {
-    console.error('❌ Error in doPost:', error);
-    return createResponse(false, 'Server error: ' + error.toString(), null, 500);
-  }
-}
-
-// Rate limiting function
-function checkRateLimit(ip) {
-  const cache = CacheService.getScriptCache();
-  const key = `rate_${ip || 'global'}`;
-  const requests = parseInt(cache.get(key)) || 0;
-  
-  if (requests >= RATE_LIMIT.maxRequests) {
-    return false;
-  }
-  
-  cache.put(key, requests + 1, RATE_LIMIT.timeWindow / 1000);
-  return true;
-}
-
-// Password hashing with salt
-function hashPassword(password) {
-  const salt = Utilities.getUuid();
-  const hash = Utilities.computeDigest(
-    Utilities.DigestAlgorithm.SHA_256,
-    password + salt
-  );
-  return {
-    hash: hash.map(b => ('00' + (b & 0xFF).toString(16)).slice(-2)).join(''),
-    salt: salt
-  };
-}
-
-// Verify password
-function verifyPassword(password, storedHash, salt) {
-  const hash = Utilities.computeDigest(
-    Utilities.DigestAlgorithm.SHA_256,
-    password + salt
-  );
-  const inputHash = hash.map(b => ('00' + (b & 0xFF).toString(16)).slice(-2)).join('');
-  return inputHash === storedHash;
-}
-
-// Get or create user trades sheet
-function getUserTradesSheet(userId) {
-  if (!userId || typeof userId !== 'string') {
-    throw new Error('Invalid user ID');
-  }
-  
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  // Shorten userId for sheet name (max 31 chars)
-  const shortId = userId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 20);
-  const sheetName = `Trades_${shortId}`;
-  
-  console.log('Looking for sheet:', sheetName);
-  
-  let sheet = ss.getSheetByName(sheetName);
-  
-  if (!sheet) {
-    sheet = ss.insertSheet(sheetName);
-    // Add headers
-    sheet.appendRow(['Trade ID', 'Date', 'Time', 'Pair', 'Session', 'Type', 'Result', 
-                     'Entry Price', 'Exit Price', 'Risk Amount', 'Reward Amount',
-                     'Profit/Loss', 'Notes', 'Screenshot URL', 'Created At']);
-    
-    // Format header row
-    const headerRange = sheet.getRange(1, 1, 1, 15);
-    headerRange.setBackground('#4a86e8')
-      .setFontColor('white')
-      .setFontWeight('bold');
-    
-    // Set column widths
-    sheet.setColumnWidth(1, 150); // Trade ID
-    sheet.setColumnWidth(2, 100); // Date
-    sheet.setColumnWidth(3, 80);  // Time
-    sheet.setColumnWidth(4, 80);  // Pair
-    sheet.setColumnWidth(5, 100); // Session
-    sheet.setColumnWidth(6, 80);  // Type
-    sheet.setColumnWidth(7, 80);  // Result
-    sheet.setColumnWidth(8, 100); // Entry Price
-    sheet.setColumnWidth(9, 100); // Exit Price
-    sheet.setColumnWidth(10, 100); // Risk Amount
-    sheet.setColumnWidth(11, 100); // Reward Amount
-    sheet.setColumnWidth(12, 100); // Profit/Loss
-    sheet.setColumnWidth(13, 200); // Notes
-    sheet.setColumnWidth(14, 200); // Screenshot URL
-    sheet.setColumnWidth(15, 150); // Created At
-    
-    console.log('✅ Created trades sheet:', sheetName);
-  }
-  
-  return sheet;
-}
-
-// User authentication
-function loginUser(email, password, name) {
-  console.log('Login attempt for:', email);
-  
-  if (!email || !password) {
-    return createResponse(false, 'Email and password are required');
-  }
-  
-  if (typeof email !== 'string' || typeof password !== 'string') {
-    return createResponse(false, 'Invalid input format');
-  }
-  
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  if (!sheet) {
-    console.error('UsersData sheet not found!');
-    return createResponse(false, 'Server error: UsersData sheet not found');
-  }
-  
-  const data = sheet.getDataRange().getValues();
-  
-  // Find existing user
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][1] === email) {
-      // Verify password
-      const storedHash = data[i][3];
-      const salt = data[i][4];
-      
-      if (verifyPassword(password, storedHash, salt)) {
-        // Update last login
-        sheet.getRange(i + 1, 7).setValue(new Date().toISOString());
-        
-        console.log('✅ Login successful for:', email);
-        return createResponse(true, 'Login successful', {
-          userId: data[i][0],
-          email: data[i][1],
-          name: data[i][2],
-          createdAt: data[i][5],
-          lastLogin: data[i][6],
-          isAdmin: (i === 1) // First user is admin
-        });
-      } else {
-        console.log('❌ Invalid password for:', email);
-        return createResponse(false, 'Invalid password');
-      }
-    }
-  }
-  
-  // Create new user
-  console.log('Creating new user:', email);
-  const userId = 'user_' + Utilities.getUuid();
-  const passwordData = hashPassword(password);
-  const now = new Date().toISOString();
-  
-  // Validate name
-  const displayName = name || email.split('@')[0];
-  
-  // Add user to UsersData sheet
-  sheet.appendRow([userId, email, displayName, passwordData.hash, passwordData.salt, now, now]);
-  
-  // Create user trades sheet
-  getUserTradesSheet(userId);
-  
-  const isAdmin = (sheet.getLastRow() === 2); // First user after header
-  
-  console.log('✅ User registered successfully:', email);
-  return createResponse(true, 'User registered successfully', {
-    userId: userId,
-    email: email,
-    name: displayName,
-    createdAt: now,
-    lastLogin: now,
-    isAdmin: isAdmin
-  });
-}
-
-// Validate trade data
-function validateTrade(trade) {
-  if (!trade || typeof trade !== 'object') {
-    throw new Error('Invalid trade data');
-  }
-  
-  // Required fields
-  const required = ['date', 'time', 'pair', 'session', 'type', 'result'];
-  for (const field of required) {
-    if (!trade[field]) {
-      throw new Error(`Missing required field: ${field}`);
-    }
-  }
-  
-  // Validate date format
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(trade.date)) {
-    throw new Error('Invalid date format. Use YYYY-MM-DD');
-  }
-  
-  // Validate time format
-  const timeRegex = /^\d{2}:\d{2}$/;
-  if (!timeRegex.test(trade.time)) {
-    throw new Error('Invalid time format. Use HH:MM');
-  }
-  
-  // Validate result
-  const validResults = ['Win', 'Loss', 'Breakeven'];
-  if (!validResults.includes(trade.result)) {
-    throw new Error('Invalid result. Must be Win, Loss, or Breakeven');
-  }
-  
-  // Validate session
-  const validSessions = ['Asian', 'European', 'American'];
-  if (!validSessions.includes(trade.session)) {
-    throw new Error('Invalid session. Must be Asian, European, or American');
-  }
-  
-  // Validate type
-  const validTypes = ['Buy', 'Sell'];
-  if (!validTypes.includes(trade.type)) {
-    throw new Error('Invalid type. Must be Buy or Sell');
-  }
-  
-  // Validate pair (basic check)
-  if (trade.pair.length > 10) {
-    throw new Error('Pair name too long');
-  }
-  
-  // Validate numeric fields if present
-  const numericFields = ['riskAmount', 'rewardAmount', 'entryPrice', 'exitPrice'];
-  for (const field of numericFields) {
-    if (trade[field] && isNaN(parseFloat(trade[field]))) {
-      throw new Error(`Invalid ${field}. Must be a number`);
-    }
-  }
-}
-
-// Validate user ID
-function validateUserId(userId) {
-  if (!userId || typeof userId !== 'string' || !userId.startsWith('user_')) {
-    throw new Error('Invalid user ID');
-  }
-}
-
-// Validate trade ID
-function validateTradeId(tradeId) {
-  if (!tradeId || typeof tradeId !== 'string') {
-    throw new Error('Invalid trade ID');
-  }
-}
-
-// Add trade for user
-function addTrade(userId, trade) {
-  console.log('Adding trade for user:', userId.substring(0, 10));
-  
-  const sheet = getUserTradesSheet(userId);
-  const tradeId = 'trade_' + Utilities.getUuid();
-  const createdAt = new Date().toISOString();
-  
-  // Calculate profit/loss
-  let profitLoss = 0;
-  if (trade.result === 'Win' && trade.rewardAmount) {
-    profitLoss = parseFloat(trade.rewardAmount);
-  } else if (trade.result === 'Loss' && trade.riskAmount) {
-    profitLoss = -parseFloat(trade.riskAmount);
-  }
-  
-  // Prepare row data
-  const rowData = [
-    tradeId,
-    trade.date,
-    trade.time,
-    trade.pair,
-    trade.session,
-    trade.type,
-    trade.result,
-    trade.entryPrice || '',
-    trade.exitPrice || '',
-    trade.riskAmount || '',
-    trade.rewardAmount || '',
-    profitLoss,
-    (trade.notes || '').substring(0, 500), // Limit notes length
-    trade.screenshotUrl || '',
-    createdAt
-  ];
-  
-  // Append the row
-  sheet.appendRow(rowData);
-  
-  console.log('✅ Trade added:', tradeId);
-  return createResponse(true, 'Trade added successfully', {
-    tradeId: tradeId,
-    createdAt: createdAt,
-    profitLoss: profitLoss
-  });
-}
-
-// Get user's trades
-function getUserTrades(userId) {
-  console.log('Getting trades for user:', userId.substring(0, 10));
-  
-  try {
-    const sheet = getUserTradesSheet(userId);
-    const data = sheet.getDataRange().getValues();
-    const trades = [];
-    
-    // Skip header row
-    for (let i = 1; i < data.length; i++) {
-      trades.push({
-        id: data[i][0] || '',
-        date: data[i][1] || '',
-        time: data[i][2] || '',
-        pair: data[i][3] || '',
-        session: data[i][4] || '',
-        type: data[i][5] || '',
-        result: data[i][6] || '',
-        entryPrice: data[i][7] || '',
-        exitPrice: data[i][8] || '',
-        riskAmount: data[i][9] || '',
-        rewardAmount: data[i][10] || '',
-        profitLoss: parseFloat(data[i][11]) || 0,
-        notes: data[i][12] || '',
-        screenshotUrl: data[i][13] || '',
-        createdAt: data[i][14] || ''
-      });
-    }
-    
-    console.log('✅ Retrieved', trades.length, 'trades');
-    return createResponse(true, 'Trades retrieved successfully', trades);
-  } catch (error) {
-    console.error('❌ Error getting user trades:', error);
-    return createResponse(false, 'Error retrieving trades: ' + error.toString(), []);
-  }
-}
-
-// Update user's trade
-function updateTrade(userId, tradeId, trade) {
-  console.log('Updating trade:', tradeId);
-  
-  const sheet = getUserTradesSheet(userId);
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === tradeId) {
-      // Calculate profit/loss
-      let profitLoss = 0;
-      if (trade.result === 'Win' && trade.rewardAmount) {
-        profitLoss = parseFloat(trade.rewardAmount);
-      } else if (trade.result === 'Loss' && trade.riskAmount) {
-        profitLoss = -parseFloat(trade.riskAmount);
-      }
-      
-      // Update the row
-      const row = i + 1;
-      sheet.getRange(row, 2, 1, 13).setValues([[
-        trade.date,
-        trade.time,
-        trade.pair,
-        trade.session,
-        trade.type,
-        trade.result,
-        trade.entryPrice || '',
-        trade.exitPrice || '',
-        trade.riskAmount || '',
-        trade.rewardAmount || '',
-        profitLoss,
-        (trade.notes || '').substring(0, 500),
-        trade.screenshotUrl || ''
-      ]]);
-      
-      console.log('✅ Trade updated:', tradeId);
-      return createResponse(true, 'Trade updated successfully');
-    }
-  }
-  
-  console.log('❌ Trade not found:', tradeId);
-  return createResponse(false, 'Trade not found');
-}
-
-// Delete user's trade
-function deleteTrade(userId, tradeId) {
-  console.log('Deleting trade:', tradeId);
-  
-  const sheet = getUserTradesSheet(userId);
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === tradeId) {
-      // Delete the row
-      sheet.deleteRow(i + 1);
-      console.log('✅ Trade deleted:', tradeId);
-      return createResponse(true, 'Trade deleted successfully');
-    }
-  }
-  
-  console.log('❌ Trade not found:', tradeId);
-  return createResponse(false, 'Trade not found');
-}
-
-// Delete all user's trades
-function deleteAllUserTrades(userId) {
-  console.log('Deleting all trades for user:', userId.substring(0, 10));
-  
-  const sheet = getUserTradesSheet(userId);
-  
-  // Delete all rows except header
-  const lastRow = sheet.getLastRow();
-  if (lastRow > 1) {
-    sheet.deleteRows(2, lastRow - 1);
-  }
-  
-  console.log('✅ All trades deleted for user');
-  return createResponse(true, 'All trades deleted successfully');
-}
-
-// Upload screenshot to user's folder
-function uploadScreenshot(userId, base64Data, filename) {
-  console.log('Uploading screenshot for user:', userId.substring(0, 10));
-  
-  try {
-    if (!base64Data) {
-      throw new Error('No screenshot data provided');
-    }
-    
-    // Extract base64 data (remove data:image/png;base64, prefix if present)
-    const base64Image = base64Data.split(',')[1] || base64Data;
-    
-    // Validate base64
-    if (!base64Image || base64Image.length < 100) {
-      throw new Error('Invalid image data');
-    }
-    
-    // Decode base64 to blob
-    const decoded = Utilities.base64Decode(base64Image);
-    const blob = Utilities.newBlob(decoded, 'image/png', filename || 'screenshot.png');
-    
-    // Create user-specific folder
-    const shortId = userId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
-    const userFolderName = `User_${shortId}_Screenshots`;
-    let folder;
-    
-    // First, create main folder if it doesn't exist
-    let mainFolder;
-    const mainFolders = DriveApp.getFoldersByName('Trading Journal Screenshots');
-    if (mainFolders.hasNext()) {
-      mainFolder = mainFolders.next();
-    } else {
-      mainFolder = DriveApp.createFolder('Trading Journal Screenshots');
-    }
-    
-    // Check if user folder exists
-    const userFolders = mainFolder.getFoldersByName(userFolderName);
-    if (userFolders.hasNext()) {
-      folder = userFolders.next();
-    } else {
-      folder = mainFolder.createFolder(userFolderName);
-    }
-    
-    // Upload file
-    const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    
-    console.log('✅ Screenshot uploaded:', file.getUrl());
-    return createResponse(true, 'Screenshot uploaded successfully', {
-      url: file.getUrl(),
-      id: file.getId(),
-      name: file.getName()
-    });
-  } catch(error) {
-    console.error('❌ Screenshot upload error:', error);
-    return createResponse(false, 'Screenshot upload failed: ' + error.toString());
-  }
-}
-
-// Get all users (admin only)
-function getAllUsers() {
-  console.log('Getting all users');
-  
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  if (!sheet) {
-    console.error('UsersData sheet not found!');
-    return createResponse(false, 'UsersData sheet not found', []);
-  }
-  
-  const data = sheet.getDataRange().getValues();
-  const users = [];
-  
-  // Skip header row
-  for (let i = 1; i < data.length; i++) {
-    const userId = data[i][0];
-    
-    // Get user's trade count
-    let tradeCount = 0;
-    try {
-      const tradesSheet = getUserTradesSheet(userId);
-      tradeCount = Math.max(0, tradesSheet.getLastRow() - 1);
-    } catch(e) {
-      console.log('Note: Could not get trade count for user:', userId);
-    }
-    
-    users.push({
-      userId: userId,
-      email: data[i][1] || '',
-      name: data[i][2] || '',
-      createdAt: data[i][5] || '',
-      lastLogin: data[i][6] || '',
-      tradeCount: tradeCount,
-      isAdmin: (i === 1)
-    });
-  }
-  
-  console.log('✅ Retrieved', users.length, 'users');
-  return createResponse(true, 'Users retrieved successfully', users);
-}
-
-// Get user statistics
-function getUserStats(userId) {
-  console.log('Getting stats for user:', userId.substring(0, 10));
-  
-  try {
-    const sheet = getUserTradesSheet(userId);
-    const data = sheet.getDataRange().getValues();
-    
-    let totalTrades = Math.max(0, data.length - 1);
-    let wins = 0;
-    let losses = 0;
-    let totalProfitLoss = 0;
-    let totalRisk = 0;
-    let totalReward = 0;
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][6] === 'Win') {
-        wins++;
-        totalReward += parseFloat(data[i][10]) || 0;
-      }
-      if (data[i][6] === 'Loss') {
-        losses++;
-        totalRisk += parseFloat(data[i][9]) || 0;
-      }
-      totalProfitLoss += parseFloat(data[i][11]) || 0;
-    }
-    
-    const winRate = totalTrades > 0 ? (wins / totalTrades * 100).toFixed(1) : 0;
-    const riskRewardRatio = totalRisk > 0 ? (totalReward / totalRisk).toFixed(2) : 0;
-    
-    return createResponse(true, 'User stats retrieved', {
-      totalTrades: totalTrades,
-      wins: wins,
-      losses: losses,
-      winRate: parseFloat(winRate),
-      totalProfitLoss: totalProfitLoss,
-      totalRisk: totalRisk,
-      totalReward: totalReward,
-      riskRewardRatio: parseFloat(riskRewardRatio)
-    });
-  } catch (error) {
-    console.error('❌ Error getting user stats:', error);
-    return createResponse(false, 'Error getting stats: ' + error.toString());
-  }
-}
-
-// Delete all users data (admin only)
-function deleteAllUsersData(adminPassword) {
-  console.log('Attempting to delete all users data');
-  
-  if (adminPassword !== ADMIN_PASSWORD) {
-    console.log('❌ Invalid admin password');
-    return createResponse(false, 'Invalid admin password');
-  }
-  
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  try {
-    // Get all sheets
-    const sheets = ss.getSheets();
-    
-    // Delete all sheets except UsersData
-    for (let i = sheets.length - 1; i >= 0; i--) {
-      const sheet = sheets[i];
-      const sheetName = sheet.getName();
-      
-      if (sheetName !== SHEET_NAME) {
-        ss.deleteSheet(sheet);
-        console.log('Deleted sheet:', sheetName);
-      }
-    }
-    
-    // Clear UsersData except header
-    const userSheet = ss.getSheetByName(SHEET_NAME);
-    if (userSheet && userSheet.getLastRow() > 1) {
-      userSheet.deleteRows(2, userSheet.getLastRow() - 1);
-      console.log('Cleared UsersData sheet');
-    }
-    
-    // Delete all screenshots folders
-    const mainFolders = DriveApp.getFoldersByName('Trading Journal Screenshots');
-    if (mainFolders.hasNext()) {
-      const mainFolder = mainFolders.next();
-      const subFolders = mainFolder.getFolders();
-      while (subFolders.hasNext()) {
-        const folder = subFolders.next();
-        if (folder.getName().includes('_Screenshots')) {
-          folder.setTrashed(true);
-          console.log('Deleted folder:', folder.getName());
-        }
-      }
-    }
-    
-    console.log('✅ All users data deleted successfully');
-    return createResponse(true, 'All users data deleted successfully');
-  } catch (error) {
-    console.error('❌ Error deleting all data:', error);
-    return createResponse(false, 'Error deleting data: ' + error.toString());
-  }
-}
-
-// Create consistent response
-function createResponse(success, message, data = null, statusCode = 200) {
-  const response = {
-    success: success,
-    message: message,
-    timestamp: new Date().toISOString(),
-    data: data
-  };
-  
-  console.log('Response:', success ? '✅' : '❌', message);
-  
-  const output = ContentService
-    .createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
-  
-  // Add CORS headers
-  output.setHeader('Access-Control-Allow-Origin', '*');
-  output.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  return output;
-}
-
-// ============================================
-// MANUAL SETUP FUNCTIONS (Run these in Apps Script)
-// ============================================
-
-// Run this function FIRST to create everything manually
-function manualSetup() {
-  console.log('🚀 Starting manual setup...');
-  
-  try {
-    // 1. Create UsersData sheet
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let usersSheet = ss.getSheetByName(SHEET_NAME);
-    
-    if (!usersSheet) {
-      usersSheet = ss.insertSheet(SHEET_NAME);
-      usersSheet.appendRow(['User ID', 'Email', 'Name', 'Password Hash', 'Salt', 'Created At', 'Last Login']);
-      
-      // Format
-      const headerRange = usersSheet.getRange(1, 1, 1, 7);
-      headerRange.setBackground('#4a86e8')
-        .setFontColor('white')
-        .setFontWeight('bold');
-      
-      console.log('✅ Created UsersData sheet');
-    } else {
-      console.log('✅ UsersData sheet already exists');
-    }
-    
-    // 2. Create main screenshots folder
-    const mainFolders = DriveApp.getFoldersByName('Trading Journal Screenshots');
-    if (!mainFolders.hasNext()) {
-      DriveApp.createFolder('Trading Journal Screenshots');
-      console.log('✅ Created main screenshots folder');
-    } else {
-      console.log('✅ Main screenshots folder already exists');
-    }
-    
-    // 3. List all sheets
-    const sheets = ss.getSheets();
-    console.log('📋 Current sheets:', sheets.map(s => s.getName()));
-    
-    console.log('🎉 Manual setup completed successfully!');
-    return 'Setup completed successfully! Sheets: ' + sheets.map(s => s.getName()).join(', ');
-  } catch (error) {
-    console.error('❌ Manual setup failed:', error);
-    return 'Setup failed: ' + error.toString();
-  }
-}
-
-// Test function to check setup
-function testSetup() {
-  console.log('🧪 Testing setup...');
-  
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheets = ss.getSheets();
-    
-    const result = {
-      success: true,
-      totalSheets: sheets.length,
-      sheetNames: sheets.map(s => s.getName()),
-      hasUsersData: sheets.some(s => s.getName() === SHEET_NAME),
-      message: 'Setup test completed'
-    };
-    
-    console.log('Test result:', result);
-    return result;
-  } catch (error) {
-    console.error('Test failed:', error);
-    return {
-      success: false,
-      error: error.toString(),
-      message: 'Setup test failed'
-    };
-  }
-}
-
-// Clear all data (DANGEROUS - use carefully)
-function clearAllData() {
-  console.log('⚠️ Clearing all data...');
-  
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheets = ss.getSheets();
-  
-  // Delete all sheets except UsersData
-  for (let i = sheets.length - 1; i >= 0; i--) {
-    const sheet = sheets[i];
-    if (sheet.getName() !== SHEET_NAME) {
-      ss.deleteSheet(sheet);
-    }
-  }
-  
-  // Clear UsersData
-  const userSheet = ss.getSheetByName(SHEET_NAME);
-  if (userSheet && userSheet.getLastRow() > 1) {
-    userSheet.deleteRows(2, userSheet.getLastRow() - 1);
-  }
-  
-  console.log('✅ All data cleared');
-  return 'All data cleared successfully';
-}
-                            </pre>
-                        </div>
-                        <button class="btn btn-secondary" id="copyCodeBtn">
-                            <span class="material-icons">content_copy</span>
-                            Copy Code
-                        </button>
-                    </div>
-                </div>
-            </main>
+            </div>
         </div>
     </div>
 
-    <!-- Add/Edit Trade Modal -->
+    <!-- Add/Edit Modal -->
     <div id="tradeModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Add New Trade</h3>
-                <button class="btn btn-icon-small" id="closeModal">
+                <h3 id="modalTitle">Add Trade</h3>
+                <button class="action-btn" onclick="closeModal()">
                     <span class="material-icons">close</span>
                 </button>
             </div>
-            <form id="tradeForm">
+            <form id="tradeForm" onsubmit="saveTrade(event)">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="tradeDate">Date *</label>
+                        <label>Date</label>
                         <input type="date" id="tradeDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="tradeTime">Time *</label>
+                        <label>Time</label>
                         <input type="time" id="tradeTime" required>
                     </div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="tradePair">Pair *</label>
-                        <input type="text" id="tradePair" placeholder="e.g., EUR/USD" required maxlength="10">
+                        <label>Pair</label>
+                        <input type="text" id="tradePair" placeholder="EUR/USD" required>
                     </div>
                     <div class="form-group">
-                        <label for="tradeSession">Session *</label>
+                        <label>Session</label>
                         <select id="tradeSession" required>
-                            <option value="">Select Session</option>
+                            <option value="">Select</option>
                             <option value="Asian">Asian</option>
                             <option value="European">European</option>
                             <option value="American">American</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="tradeType">Type *</label>
+                        <label>Type</label>
                         <select id="tradeType" required>
-                            <option value="">Select Type</option>
+                            <option value="">Select</option>
                             <option value="Buy">Buy</option>
                             <option value="Sell">Sell</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="tradeResult">Result *</label>
+                        <label>Result</label>
                         <select id="tradeResult" required>
-                            <option value="">Select Result</option>
+                            <option value="">Select</option>
                             <option value="Win">Win</option>
                             <option value="Loss">Loss</option>
                             <option value="Breakeven">Breakeven</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="entryPrice">Entry Price</label>
-                        <input type="number" id="entryPrice" step="0.00001" placeholder="1.12345">
-                    </div>
-                    <div class="form-group">
-                        <label for="exitPrice">Exit Price</label>
-                        <input type="number" id="exitPrice" step="0.00001" placeholder="1.12455">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="riskAmount">Risk Amount ($)</label>
+                        <label>Risk Amount ($)</label>
                         <input type="number" id="riskAmount" step="0.01" placeholder="100.00">
                     </div>
                     <div class="form-group">
-                        <label for="rewardAmount">Reward Amount ($)</label>
+                        <label>Reward Amount ($)</label>
                         <input type="number" id="rewardAmount" step="0.01" placeholder="300.00">
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label for="tradeNotes">Notes (max 500 characters)</label>
-                    <textarea id="tradeNotes" rows="4" placeholder="Add any notes about this trade..." maxlength="500"></textarea>
-                    <div style="font-size: 12px; opacity: 0.7; text-align: right; margin-top: 4px;">
-                        <span id="notesCounter">0/500</span>
-                    </div>
+                    <label>Notes</label>
+                    <textarea id="tradeNotes" rows="3" placeholder="Trade notes..."></textarea>
                 </div>
-
-                <div class="form-group">
-                    <label for="screenshotUpload">
-                        <span class="material-icons" style="vertical-align: middle;">image</span>
-                        Upload Screenshot (Optional, PNG/JPG)
-                    </label>
-                    <input type="file" id="screenshotUpload" accept="image/png,image/jpeg,image/jpg">
-                    <div id="screenshotPreview" class="screenshot-preview"></div>
-                </div>
-
                 <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn btn-success" id="saveTradeBtn">
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">
                         <span class="material-icons">save</span>
-                        <span id="saveTradeText">Save Trade</span>
+                        Save
                     </button>
                 </div>
             </form>
@@ -1483,395 +259,398 @@ function clearAllData() {
     </div>
 
     <script>
-        // Configuration
-        let SCRIPT_URL = localStorage.getItem('googleScriptUrl') || '';
+        let API_URL = '';
         let currentUser = null;
         let trades = [];
-        let currentEditId = null;
-        let currentScreenshotData = null;
-        let currentTimePeriod = 'all';
+        let editingId = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            checkLoginStatus();
-            loadSettings();
-            initializeEventListeners();
+            API_URL = localStorage.getItem('apiUrl') || '';
+            const savedUser = localStorage.getItem('user');
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showApp();
+            }
+            
+            if (API_URL) {
+                document.getElementById('scriptUrl').value = API_URL;
+            }
         });
 
-        // Check if user is logged in
-        function checkLoginStatus() {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    showApp();
-                } catch (e) {
-                    localStorage.removeItem('currentUser');
-                    showLogin();
-                }
-            } else {
-                showLogin();
-            }
-        }
-
-        // Show/Hide sections
-        function showLogin() {
-            document.getElementById('loginPage').style.display = 'block';
-            document.getElementById('appContainer').style.display = 'none';
-        }
-
-        function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('appContainer').classList.add('active');
+        // Login
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const password = document.getElementById('password').value;
             
-            updateUserInfo();
-            updateConnectionStatus();
-            updateDashboard();
-        }
-
-        // Password strength checker
-        function checkPasswordStrength(password) {
-            const strength = document.getElementById('passwordStrength');
-            const bar = strength.querySelector('.password-strength-bar');
-            
-            if (password.length < 8) {
-                strength.className = 'password-strength weak';
-                return 'weak';
-            }
-            
-            let score = 0;
-            if (/[a-z]/.test(password)) score++;
-            if (/[A-Z]/.test(password)) score++;
-            if (/[0-9]/.test(password)) score++;
-            if (/[^a-zA-Z0-9]/.test(password)) score++;
-            
-            if (score <= 2) {
-                strength.className = 'password-strength weak';
-                return 'weak';
-            } else if (score === 3) {
-                strength.className = 'password-strength medium';
-                return 'medium';
-            } else {
-                strength.className = 'password-strength strong';
-                return 'strong';
-            }
-        }
-
-        // User Management
-        async function loginUser(email, password, name) {
-            if (!SCRIPT_URL) {
-                showToast('Please configure Google Sheets connection first', 'error');
-                navigateToPage('settings');
+            if (!email || !name || !password) {
+                showToast('Please fill all fields', 'error');
                 return;
             }
-
-            if (!email || !email.includes('@')) {
-                showToast('Please enter a valid email address', 'error');
+            
+            if (!API_URL) {
+                showToast('Please configure API URL in settings first', 'error');
+                showApp();
+                showPage('settings');
                 return;
             }
-
-            if (password.length < 8) {
-                showToast('Password must be at least 8 characters', 'error');
-                return;
-            }
-
+            
             try {
-                // Show loading
-                const loginBtn = document.getElementById('loginBtn');
-                const loginText = document.getElementById('loginText');
-                const originalText = loginText.textContent;
-                loginText.innerHTML = '<div class="loading"></div>';
-                loginBtn.disabled = true;
-
-                const response = await fetch(SCRIPT_URL, {
+                const res = await fetch(API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'login',
-                        email: email,
-                        password: password,
-                        name: name
-                    })
+                    body: JSON.stringify({ action: 'login', email, password, name })
                 });
                 
-                const result = await response.json();
+                const data = await res.json();
                 
-                // Restore button
-                loginText.textContent = originalText;
-                loginBtn.disabled = false;
-                
-                if (result.success) {
-                    currentUser = result.data;
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                if (data.success) {
+                    currentUser = data.data;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
                     showApp();
+                    await syncTrades();
                     showToast('Login successful!', 'success');
-                    loadUserTrades();
                 } else {
-                    showToast('Login failed: ' + result.message, 'error');
+                    showToast(data.message, 'error');
                 }
             } catch (error) {
-                // Restore button
-                const loginText = document.getElementById('loginText');
-                loginText.textContent = 'Login / Register';
-                document.getElementById('loginBtn').disabled = false;
-                
                 showToast('Login failed: ' + error.message, 'error');
             }
         }
 
-        function logoutUser() {
+        // Logout
+        function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 currentUser = null;
                 trades = [];
-                localStorage.removeItem('currentUser');
-                showLogin();
-                showToast('Logged out successfully', 'success');
+                localStorage.removeItem('user');
+                document.getElementById('app').classList.remove('active');
+                document.getElementById('loginPage').style.display = 'block';
+                showToast('Logged out', 'success');
             }
         }
 
-        function updateUserInfo() {
-            if (currentUser) {
-                document.getElementById('userDisplayName').textContent = currentUser.name;
-                const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('userAvatarSmall').textContent = initials.slice(0, 2);
-                
-                // Check if user is admin
-                if (currentUser.isAdmin) {
-                    document.getElementById('adminControls').style.display = 'block';
-                }
-            }
+        // Show app
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').classList.add('active');
+            document.getElementById('userBadge').textContent = currentUser.name;
+            updateDashboard();
         }
 
-        // Settings Management
-        function loadSettings() {
-            const savedUrl = localStorage.getItem('googleScriptUrl');
-            if (savedUrl) {
-                document.getElementById('scriptUrl').value = savedUrl;
-                SCRIPT_URL = savedUrl;
-                updateConnectionStatus();
-            }
-        }
-
-        function saveSettings() {
-            const url = document.getElementById('scriptUrl').value.trim();
-            const adminPassword = document.getElementById('adminPassword').value;
+        // Show page
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            event.target.classList.add('active');
             
-            if (url) {
-                if (!url.startsWith('https://script.google.com/macros/s/')) {
-                    showToast('Please enter a valid Google Apps Script URL', 'error');
-                    return;
-                }
+            if (page === 'journal') renderJournal();
+        }
+
+        // Sync trades
+        async function syncTrades() {
+            if (!API_URL || !currentUser) return;
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getUserTrades', userId: currentUser.userId })
+                });
                 
-                localStorage.setItem('googleScriptUrl', url);
-                SCRIPT_URL = url;
-                localStorage.setItem('adminPassword', adminPassword);
-                showToast('Settings saved successfully!', 'success');
-                updateConnectionStatus();
+                const data = await res.json();
+                
+                if (data.success) {
+                    trades = data.data || [];
+                    updateDashboard();
+                    renderJournal();
+                    showToast(`Synced ${trades.length} trades`, 'success');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Sync failed: ' + error.message, 'error');
             }
         }
 
-        // Connection Management
-        function updateConnectionStatus() {
-            const statusEl = document.getElementById('syncStatus');
-            if (SCRIPT_URL) {
-                statusEl.className = 'sync-status connected';
-                statusEl.innerHTML = '<span class="material-icons">cloud_done</span><span>Connected</span>';
-            } else {
-                statusEl.className = 'sync-status disconnected';
-                statusEl.innerHTML = '<span class="material-icons">cloud_off</span><span>Not Connected</span>';
-            }
+        // Update dashboard
+        function updateDashboard() {
+            const wins = trades.filter(t => t.result === 'Win').length;
+            const losses = trades.filter(t => t.result === 'Loss').length;
+            const total = trades.length;
+            const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
+            
+            let totalPL = 0;
+            let totalRisk = 0;
+            let totalReward = 0;
+            
+            trades.forEach(t => {
+                totalPL += t.profitLoss || 0;
+                if (t.riskAmount) totalRisk += parseFloat(t.riskAmount);
+                if (t.rewardAmount && t.result === 'Win') totalReward += parseFloat(t.rewardAmount);
+            });
+            
+            const rrRatio = totalRisk > 0 ? (totalReward / totalRisk).toFixed(2) : '0.00';
+            
+            document.getElementById('totalPL').textContent = '$' + totalPL.toFixed(2);
+            document.getElementById('totalPL').className = 'stat-value ' + (totalPL >= 0 ? 'profit' : 'loss');
+            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('totalTrades').textContent = total;
+            document.getElementById('rrRatio').textContent = rrRatio;
+            
+            renderRecent();
         }
 
-        async function testConnection() {
-            if (!SCRIPT_URL) {
-                showToast('Please enter a script URL first', 'error');
+        // Render recent trades
+        function renderRecent() {
+            const container = document.getElementById('recentTrades');
+            const recent = [...trades].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time)).slice(0, 5);
+            
+            if (recent.length === 0) {
+                container.innerHTML = '<div class="empty">No trades yet</div>';
                 return;
             }
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Pair</th>
+                            <th>Type</th>
+                            <th>Result</th>
+                            <th>P/L</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${recent.map(t => `
+                            <tr>
+                                <td>${t.date}</td>
+                                <td><strong>${t.pair}</strong></td>
+                                <td>${t.type}</td>
+                                <td style="color: ${t.result === 'Win' ? 'var(--success)' : t.result === 'Loss' ? 'var(--error)' : 'inherit'}">${t.result}</td>
+                                <td class="${t.profitLoss >= 0 ? 'profit' : 'loss'}">$${t.profitLoss.toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
 
+        // Render journal
+        function renderJournal() {
+            const container = document.getElementById('allTrades');
+            
+            if (trades.length === 0) {
+                container.innerHTML = '<div class="empty">No trades yet</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Pair</th>
+                            <th>Session</th>
+                            <th>Type</th>
+                            <th>Result</th>
+                            <th>Risk</th>
+                            <th>Reward</th>
+                            <th>P/L</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${trades.map(t => `
+                            <tr>
+                                <td>${t.date}</td>
+                                <td>${t.time}</td>
+                                <td><strong>${t.pair}</strong></td>
+                                <td>${t.session}</td>
+                                <td>${t.type}</td>
+                                <td style="color: ${t.result === 'Win' ? 'var(--success)' : t.result === 'Loss' ? 'var(--error)' : 'inherit'}">${t.result}</td>
+                                <td>$${(parseFloat(t.riskAmount) || 0).toFixed(2)}</td>
+                                <td>$${(parseFloat(t.rewardAmount) || 0).toFixed(2)}</td>
+                                <td class="${t.profitLoss >= 0 ? 'profit' : 'loss'}">$${t.profitLoss.toFixed(2)}</td>
+                                <td>
+                                    <button class="action-btn" onclick='editTrade(${JSON.stringify(t).replace(/'/g, "&#39;")})'>
+                                        <span class="material-icons">edit</span>
+                                    </button>
+                                    <button class="action-btn" onclick="deleteTrade('${t.id}')">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Open add modal
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Add Trade';
+            document.getElementById('tradeForm').reset();
+            document.getElementById('tradeDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('tradeTime').value = new Date().toTimeString().slice(0, 5);
+            document.getElementById('tradeModal').classList.add('active');
+        }
+
+        // Edit trade
+        function editTrade(trade) {
+            editingId = trade.id;
+            document.getElementById('modalTitle').textContent = 'Edit Trade';
+            document.getElementById('tradeDate').value = trade.date;
+            document.getElementById('tradeTime').value = trade.time;
+            document.getElementById('tradePair').value = trade.pair;
+            document.getElementById('tradeSession').value = trade.session;
+            document.getElementById('tradeType').value = trade.type;
+            document.getElementById('tradeResult').value = trade.result;
+            document.getElementById('riskAmount').value = trade.riskAmount || '';
+            document.getElementById('rewardAmount').value = trade.rewardAmount || '';
+            document.getElementById('tradeNotes').value = trade.notes || '';
+            document.getElementById('tradeModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+            editingId = null;
+        }
+
+        // Save trade
+        async function saveTrade(e) {
+            e.preventDefault();
+            
+            const trade = {
+                date: document.getElementById('tradeDate').value,
+                time: document.getElementById('tradeTime').value,
+                pair: document.getElementById('tradePair').value,
+                session: document.getElementById('tradeSession').value,
+                type: document.getElementById('tradeType').value,
+                result: document.getElementById('tradeResult').value,
+                riskAmount: document.getElementById('riskAmount').value,
+                rewardAmount: document.getElementById('rewardAmount').value,
+                notes: document.getElementById('tradeNotes').value
+            };
+            
             try {
-                showToast('Testing connection...', 'warning');
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
+                if (editingId) {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'updateTrade', userId: currentUser.userId, tradeId: editingId, trade })
+                    });
+                    
+                    const data = await res.json();
+                    if (data.success) {
+                        showToast('Trade updated', 'success');
+                    }
+                } else {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'addTrade', userId: currentUser.userId, trade })
+                    });
+                    
+                    const data = await res.json();
+                    if (data.success) {
+                        showToast('Trade added', 'success');
+                    }
+                }
+                
+                closeModal();
+                await syncTrades();
+            } catch (error) {
+                showToast('Save failed: ' + error.message, 'error');
+            }
+        }
+
+        // Delete trade
+        async function deleteTrade(id) {
+            if (!confirm('Delete this trade?')) return;
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'deleteTrade', userId: currentUser.userId, tradeId: id })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Trade deleted', 'success');
+                    await syncTrades();
+                }
+            } catch (error) {
+                showToast('Delete failed: ' + error.message, 'error');
+            }
+        }
+
+        // Delete all trades
+        async function deleteAllTrades() {
+            if (!confirm('Delete ALL your trades? This cannot be undone!')) return;
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'deleteAllUserTrades', userId: currentUser.userId })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    trades = [];
+                    updateDashboard();
+                    renderJournal();
+                    showToast('All trades deleted', 'success');
+                }
+            } catch (error) {
+                showToast('Delete failed: ' + error.message, 'error');
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            const url = document.getElementById('scriptUrl').value.trim();
+            if (url) {
+                API_URL = url;
+                localStorage.setItem('apiUrl', url);
+                showToast('Settings saved', 'success');
+            }
+        }
+
+        // Test connection
+        async function testConnection() {
+            const url = document.getElementById('scriptUrl').value.trim();
+            if (!url) {
+                showToast('Enter API URL first', 'error');
+                return;
+            }
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
                 
                 if (data.status === 'success') {
                     showToast('Connection successful!', 'success');
                 } else {
-                    showToast('Connection failed: ' + data.message, 'error');
+                    showToast('Connection failed', 'error');
                 }
             } catch (error) {
-                showToast('Connection failed: ' + error.message, 'error');
+                showToast('Connection error: ' + error.message, 'error');
             }
         }
 
-        // Trade Management
-        async function loadUserTrades() {
-            if (!currentUser || !SCRIPT_URL) return;
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'getUserTrades',
-                        userId: currentUser.userId
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    trades = result.data || [];
-                    showToast(`Loaded ${trades.length} trades`, 'success');
-                    updateDashboard();
-                    renderJournalTable();
-                    renderAnalysis();
-                } else {
-                    showToast('Failed to load trades: ' + result.message, 'error');
-                }
-            } catch (error) {
-                showToast('Failed to load trades: ' + error.message, 'error');
-            }
+        // Show toast
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
         }
-
-        async function refreshFromCloud() {
-            if (!currentUser) {
-                showToast('Please login first', 'error');
-                return;
-            }
-
-            if (!SCRIPT_URL) {
-                showToast('Please configure Google Sheets connection first', 'error');
-                navigateToPage('settings');
-                return;
-            }
-
-            try {
-                showToast('Refreshing from cloud...', 'warning');
-                await loadUserTrades();
-                showToast('Data refreshed from cloud!', 'success');
-            } catch (error) {
-                showToast('Refresh failed: ' + error.message, 'error');
-            }
-        }
-
-        async function addTradeToCloud(trade) {
-            if (!currentUser || !SCRIPT_URL) {
-                showToast('Not connected. Trade saved locally only.', 'warning');
-                return null;
-            }
-
-            try {
-                // Upload screenshot first if exists
-                if (currentScreenshotData) {
-                    const screenshotResult = await uploadScreenshot(currentScreenshotData, `screenshot_${Date.now()}.png`);
-                    if (screenshotResult.success) {
-                        trade.screenshotUrl = screenshotResult.data.url;
-                    }
-                }
-
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'addTrade',
-                        userId: currentUser.userId,
-                        trade: trade
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    return result.data;
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('Cloud save error:', error);
-                return null;
-            }
-        }
-
-        async function updateTradeInCloud(tradeId, trade) {
-            if (!currentUser || !SCRIPT_URL) return null;
-
-            try {
-                // Upload new screenshot if changed
-                if (currentScreenshotData) {
-                    const screenshotResult = await uploadScreenshot(currentScreenshotData, `screenshot_${tradeId}_${Date.now()}.png`);
-                    if (screenshotResult.success) {
-                        trade.screenshotUrl = screenshotResult.data.url;
-                    }
-                }
-
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'updateTrade',
-                        userId: currentUser.userId,
-                        tradeId: tradeId,
-                        trade: trade
-                    })
-                });
-                
-                const result = await response.json();
-                return result.success;
-            } catch (error) {
-                console.error('Cloud update error:', error);
-                return false;
-            }
-        }
-
-        async function deleteTradeFromCloud(tradeId) {
-            if (!currentUser || !SCRIPT_URL) return true;
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'deleteTrade',
-                        userId: currentUser.userId,
-                        tradeId: tradeId
-                    })
-                });
-                
-                const result = await response.json();
-                return result.success;
-            } catch (error) {
-                console.error('Cloud delete error:', error);
-                return false;
-            }
-        }
-
-        async function deleteAllUserTradesFromCloud() {
-            if (!currentUser || !SCRIPT_URL) return true;
-
-            if (!confirm('Are you sure you want to delete ALL your trades? This action cannot be undone!')) {
-                return false;
-            }
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'deleteAllUserTrades',
-                        userId: currentUser.userId
-                    })
-                });
-                
+    </script>
+</body>
+</html>
