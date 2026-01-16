@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-User Trading Journal - Cloud Sync</title>
+    <title>Trading Journal - Cloud Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -49,48 +49,6 @@
             padding: 20px;
         }
 
-        /* Login Page */
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 40px;
-            background: var(--card-light);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        body.dark-mode .login-container {
-            background: var(--card-dark);
-        }
-
-        .login-container h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--primary);
-        }
-
-        .user-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin: 0 auto 20px;
-        }
-
-        /* Main App */
-        .app-container {
-            display: none;
-        }
-
-        .app-container.active {
-            display: block;
-        }
-
         /* Header */
         header {
             background: var(--card-light);
@@ -103,7 +61,6 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            transition: all 0.3s ease;
         }
 
         body.dark-mode header {
@@ -126,29 +83,6 @@
             flex-wrap: wrap;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 20px;
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .user-avatar-small {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
         .sync-status {
             display: flex;
             align-items: center;
@@ -169,10 +103,6 @@
             color: var(--error);
         }
 
-        .sync-status .material-icons {
-            font-size: 16px;
-        }
-
         /* Navigation */
         nav {
             background: var(--card-light);
@@ -180,7 +110,6 @@
             border-radius: 12px;
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
         }
 
         body.dark-mode nav {
@@ -252,24 +181,9 @@
             color: white;
         }
 
-        .btn-success:hover {
-            background: #10B981;
-            transform: translateY(-2px);
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            color: white;
-        }
-
         .btn-danger {
             background: var(--error);
             color: white;
-        }
-
-        .btn-danger:hover {
-            background: #DC2626;
-            transform: translateY(-2px);
         }
 
         .btn-secondary {
@@ -314,7 +228,6 @@
             padding: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            transition: all 0.3s ease;
         }
 
         body.dark-mode .card {
@@ -368,17 +281,9 @@
             font-weight: 700;
         }
 
-        .profit {
-            color: var(--profit);
-        }
-
-        .loss {
-            color: var(--loss);
-        }
-
-        .neutral {
-            color: var(--neutral);
-        }
+        .profit { color: var(--profit); }
+        .loss { color: var(--loss); }
+        .neutral { color: var(--neutral); }
 
         /* Form */
         .form-group {
@@ -457,39 +362,8 @@
             border-bottom-color: var(--border-dark);
         }
 
-        tbody tr {
-            transition: all 0.2s ease;
-        }
-
         tbody tr:hover {
             background: rgba(59, 130, 246, 0.05);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-icon-small {
-            padding: 6px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: transparent;
-            color: var(--text-light);
-        }
-
-        body.dark-mode .btn-icon-small {
-            color: var(--text-dark);
-        }
-
-        .btn-icon-small:hover {
-            background: var(--border-light);
-        }
-
-        body.dark-mode .btn-icon-small:hover {
-            background: var(--border-dark);
         }
 
         /* Modal */
@@ -504,7 +378,6 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
         }
 
         .modal.active {
@@ -519,16 +392,10 @@
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            animation: slideUp 0.3s ease;
         }
 
         body.dark-mode .modal-content {
             background: var(--card-dark);
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
@@ -536,11 +403,6 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-        }
-
-        .modal-header h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
         }
 
         /* Toast */
@@ -555,177 +417,13 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            animation: slideInRight 0.3s ease;
             z-index: 2000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(400px); }
-            to { transform: translateX(0); }
-        }
-
         .toast.success { background: var(--success); }
         .toast.error { background: var(--error); }
-        .toast.warning { background: var(--warning); }
 
-        /* Code Block */
-        .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 12px;
-            overflow-x: auto;
-            margin: 16px 0;
-            white-space: pre;
-        }
-
-        /* User Management */
-        .user-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .user-card {
-            background: var(--card-light);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .user-card {
-            background: var(--card-dark);
-        }
-
-        .user-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-
-        .user-card-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .user-card-info {
-            flex: 1;
-        }
-
-        .user-card-name {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        .user-card-email {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-bottom: 8px;
-        }
-
-        .user-card-stats {
-            display: flex;
-            gap: 12px;
-            font-size: 12px;
-        }
-
-        .user-card-stat {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Filters */
-        .filters {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .filter-group label {
-            margin-bottom: 4px;
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        /* Admin Controls */
-        .admin-controls {
-            background: rgba(245, 158, 11, 0.1);
-            border: 2px solid var(--warning);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .admin-controls h3 {
-            color: var(--warning);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Performance Indicators */
-        .performance-indicators {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .indicator {
-            background: var(--card-light);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .indicator {
-            background: var(--card-dark);
-        }
-
-        .indicator:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .indicator-value {
-            font-size: 24px;
-            font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-            margin: 5px 0;
-        }
-
-        .indicator-label {
-            font-size: 12px;
-            opacity: 0.7;
-            text-transform: uppercase;
-        }
-
-        /* Time Filters */
         .time-filters {
             display: flex;
             gap: 10px;
@@ -754,12 +452,6 @@
             color: white;
         }
 
-        .time-filter-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -771,216 +463,444 @@
             margin-bottom: 16px;
         }
 
-        .empty-state h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            opacity: 0.7;
-            margin-bottom: 20px;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             h1 { font-size: 20px; }
             .form-row { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr; }
-            .filters { flex-direction: column; }
-            .header-controls { flex-wrap: wrap; width: 100%; }
-            .performance-indicators { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 480px) {
-            .performance-indicators { grid-template-columns: 1fr; }
-            .user-list { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="user-avatar">
-            <span class="material-icons">account_circle</span>
-        </div>
-        <h1>Multi-User Trading Journal</h1>
-        
-        <div class="form-group">
-            <label for="userEmail">Email Address</label>
-            <input type="email" id="userEmail" placeholder="your.email@example.com" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="userName">Display Name</label>
-            <input type="text" id="userName" placeholder="John Trader" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="userPassword">Password</label>
-            <input type="password" id="userPassword" placeholder="••••••••" required>
-        </div>
-        
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
-            <span class="material-icons">login</span>
-            Login / Register
-        </button>
-        
-        <p style="text-align: center; font-size: 12px; opacity: 0.7;">
-            First time users will be automatically registered
-        </p>
+    <div class="container">
+        <header>
+            <h1>
+                <span class="material-icons">analytics</span>
+                Trading Journal
+            </h1>
+            <div class="header-controls">
+                <div class="sync-status disconnected" id="syncStatus">
+                    <span class="material-icons">cloud_off</span>
+                    <span>Not Connected</span>
+                </div>
+                <button class="btn btn-icon btn-secondary" id="themeToggle">
+                    <span class="material-icons">dark_mode</span>
+                </button>
+                <button class="btn btn-primary" id="addTradeBtn">
+                    <span class="material-icons">add</span>
+                    Add Trade
+                </button>
+            </div>
+        </header>
+
+        <nav>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-page="dashboard">
+                    <span class="material-icons">dashboard</span>
+                    Dashboard
+                </button>
+                <button class="nav-tab" data-page="journal">
+                    <span class="material-icons">book</span>
+                    Journal
+                </button>
+                <button class="nav-tab" data-page="settings">
+                    <span class="material-icons">settings</span>
+                    Settings
+                </button>
+            </div>
+        </nav>
+
+        <main>
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="time-filters">
+                    <button class="time-filter-btn active" data-period="all">All Time</button>
+                    <button class="time-filter-btn" data-period="today">Today</button>
+                    <button class="time-filter-btn" data-period="week">This Week</button>
+                    <button class="time-filter-btn" data-period="month">This Month</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Profit/Loss</div>
+                        <div class="stat-value" id="totalProfitLoss">$0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value" id="winRate">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Trades</div>
+                        <div class="stat-value neutral" id="totalTrades">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Risk/Reward</div>
+                        <div class="stat-value" id="riskReward">0.00</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h2 style="margin: 0;">
+                            <span class="material-icons">bar_chart</span>
+                            Recent Trades
+                        </h2>
+                        <button class="btn btn-success" id="syncBtn">
+                            <span class="material-icons">sync</span>
+                            Sync from Cloud
+                        </button>
+                    </div>
+                    <div id="recentTradesContainer"></div>
+                </div>
+            </div>
+
+            <!-- Journal Page -->
+            <div id="journal" class="page">
+                <div class="card">
+                    <h2>
+                        <span class="material-icons">table_chart</span>
+                        All Trades
+                    </h2>
+                    <div id="allTradesContainer"></div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page">
+                <div class="card">
+                    <h2>
+                        <span class="material-icons">cloud</span>
+                        Google Sheets Integration
+                    </h2>
+                    <div class="form-group">
+                        <label>Google Apps Script Web App URL</label>
+                        <input type="text" id="apiUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" id="saveApiUrl">
+                            <span class="material-icons">save</span>
+                            Save URL
+                        </button>
+                        <button class="btn btn-secondary" id="testConnection">
+                            <span class="material-icons">link</span>
+                            Test Connection
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card" style="background: rgba(239, 68, 68, 0.1); border: 2px solid var(--error);">
+                    <h2 style="color: var(--error);">
+                        <span class="material-icons">warning</span>
+                        Danger Zone
+                    </h2>
+                    <p style="margin-bottom: 16px;">Permanently delete all trading data. This action cannot be undone.</p>
+                    <button class="btn btn-danger" id="deleteAllBtn">
+                        <span class="material-icons">delete_forever</span>
+                        Delete All Data
+                    </button>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- Main App -->
-    <div id="appContainer" class="app-container">
-        <div class="container">
-            <header>
-                <h1>
-                    <span class="material-icons">analytics</span>
-                    Multi-User Trading Journal
-                </h1>
-                <div class="header-controls">
-                    <div class="user-info" id="currentUserInfo">
-                        <div class="user-avatar-small" id="userAvatarSmall">U</div>
-                        <span id="userDisplayName">User</span>
+    <!-- Add/Edit Trade Modal -->
+    <div id="tradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Trade</h3>
+                <button class="btn btn-icon btn-secondary" id="closeModal">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <form id="tradeForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="tradeDate" required>
                     </div>
-                    <div class="sync-status disconnected" id="syncStatus">
-                        <span class="material-icons">cloud_off</span>
-                        <span>Not Connected</span>
-                    </div>
-                    <button class="btn btn-icon btn-secondary" id="themeToggle">
-                        <span class="material-icons">dark_mode</span>
-                    </button>
-                    <button class="btn btn-primary" id="addTradeBtn">
-                        <span class="material-icons">add</span>
-                        Add Trade
-                    </button>
-                </div>
-            </header>
-
-            <nav>
-                <div class="nav-tabs">
-                    <button class="nav-tab active" data-page="dashboard">
-                        <span class="material-icons">dashboard</span>
-                        Dashboard
-                    </button>
-                    <button class="nav-tab" data-page="journal">
-                        <span class="material-icons">book</span>
-                        Journal
-                    </button>
-                    <button class="nav-tab" data-page="analysis">
-                        <span class="material-icons">insights</span>
-                        Analysis
-                    </button>
-                    <button class="nav-tab" data-page="risk">
-                        <span class="material-icons">security</span>
-                        Risk/Reward
-                    </button>
-                    <button class="nav-tab" data-page="users" id="usersTab">
-                        <span class="material-icons">group</span>
-                        Users
-                    </button>
-                    <button class="nav-tab" data-page="settings">
-                        <span class="material-icons">settings</span>
-                        Settings
-                    </button>
-                    <button class="btn btn-danger" id="logoutBtn" style="margin-left: auto;">
-                        <span class="material-icons">logout</span>
-                        Logout
-                    </button>
-                </div>
-            </nav>
-
-            <main>
-                <!-- Dashboard Page -->
-                <div id="dashboard" class="page active">
-                    <div class="time-filters">
-                        <button class="time-filter-btn active" data-period="all">All Time</button>
-                        <button class="time-filter-btn" data-period="today">Today</button>
-                        <button class="time-filter-btn" data-period="week">This Week</button>
-                        <button class="time-filter-btn" data-period="month">This Month</button>
-                        <button class="time-filter-btn" data-period="year">This Year</button>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Total Profit/Loss</div>
-                            <div class="stat-value" id="totalProfitLoss">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Risk/Reward Ratio</div>
-                            <div class="stat-value" id="riskRewardRatio">0.00</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Win Rate</div>
-                            <div class="stat-value" id="winRate">0%</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Average Risk</div>
-                            <div class="stat-value" id="averageRisk">$0</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                            <h2 style="margin: 0;">
-                                <span class="material-icons">bar_chart</span>
-                                Recent Trades
-                            </h2>
-                            <button class="btn btn-success" id="syncBtn">
-                                <span class="material-icons">sync</span>
-                                Sync from Cloud
-                            </button>
-                        </div>
-                        <div id="recentTradesContainer"></div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="tradeTime" required>
                     </div>
                 </div>
-
-                <!-- Journal Page -->
-                <div id="journal" class="page">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">filter_list</span>
-                            Filters
-                        </h2>
-                        <div class="filters">
-                            <div class="filter-group">
-                                <label>Search</label>
-                                <input type="text" id="searchFilter" placeholder="Search by pair or notes...">
-                            </div>
-                            <div class="filter-group">
-                                <label>Session</label>
-                                <select id="sessionFilter">
-                                    <option value="">All Sessions</option>
-                                    <option value="Asian">Asian</option>
-                                    <option value="European">European</option>
-                                    <option value="American">American</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Result</label>
-                                <select id="resultFilter">
-                                    <option value="">All Results</option>
-                                    <option value="Win">Win</option>
-                                    <option value="Loss">Loss</option>
-                                    <option value="Breakeven">Breakeven</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Date Range</label>
-                                <input type="date" id="dateFromFilter">
-                                <input type="date" id="dateToFilter" style="margin-top: 4px;">
-                            </div>
-                            <button class="btn btn-secondary" id="clearFilters">
-                                <span class="material-icons">clear</span>
-                                Clear All
-                            </button>
-                        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Currency Pair</label>
+                        <input type="text" id="tradePair" placeholder="EUR/USD" required>
                     </div>
+                    <div class="form-group">
+                        <label>Session</label>
+                        <select id="tradeSession" required>
+                            <option value="">Select Session</option>
+                            <option value="Asian">Asian</option>
+                            <option value="European">European</option>
+                            <option value="American">American</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="tradeType" required>
+                            <option value="">Select Type</option>
+                            <option value="Buy">Buy</option>
+                            <option value="Sell">Sell</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Result</label>
+                        <select id="tradeResult" required>
+                            <option value="">Select Result</option>
+                            <option value="Win">Win</option>
+                            <option value="Loss">Loss</option>
+                            <option value="Breakeven">Breakeven</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Entry Price</label>
+                        <input type="number" id="tradeEntry" step="0.00001" placeholder="1.09850">
+                    </div>
+                    <div class="form-group">
+                        <label>Exit Price</label>
+                        <input type="number" id="tradeExit" step="0.00001" placeholder="1.10050">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Risk Amount ($)</label>
+                        <input type="number" id="tradeRisk" step="0.01" placeholder="50.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Reward Amount ($)</label>
+                        <input type="number" id="tradeReward" step="0.01" placeholder="100.00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="tradeNotes" rows="3" placeholder="Trade analysis and notes..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" id="cancelModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons">save</span>
+                        Save Trade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                            <h2 style="margin: 0;">
-                                <span class="material-icons">table_chart</span>
-                                All Trades
-                                <span style="font-size: 14px
+    <script>
+        // State
+        const state = {
+            apiUrl: localStorage.getItem('apiUrl') || '',
+            trades: [],
+            currentFilter: 'all',
+            editingTradeId: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApiUrl();
+            initEventListeners();
+            if (state.apiUrl) {
+                syncFromCloud();
+            }
+            updateDashboard();
+        });
+
+        // Event Listeners
+        function initEventListeners() {
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('addTradeBtn').addEventListener('click', () => openModal());
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('cancelModal').addEventListener('click', closeModal);
+            document.getElementById('tradeForm').addEventListener('submit', handleSaveTrade);
+            document.getElementById('syncBtn').addEventListener('click', syncFromCloud);
+            document.getElementById('saveApiUrl').addEventListener('click', saveApiUrl);
+            document.getElementById('testConnection').addEventListener('click', testConnection);
+            document.getElementById('deleteAllBtn').addEventListener('click', deleteAllData);
+
+            // Navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchPage(tab.dataset.page));
+            });
+
+            // Time filters
+            document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.time-filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentFilter = btn.dataset.period;
+                    updateDashboard();
+                });
+            });
+        }
+
+        // Navigation
+        function switchPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(pageName).classList.add('active');
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+        }
+
+        // Theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.querySelector('#themeToggle .material-icons');
+            icon.textContent = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode';
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('#themeToggle .material-icons').textContent = 'light_mode';
+        }
+
+        // API Functions
+        function loadApiUrl() {
+            const url = localStorage.getItem('apiUrl');
+            if (url) {
+                state.apiUrl = url;
+                document.getElementById('apiUrl').value = url;
+                updateSyncStatus(true);
+            }
+        }
+
+        function saveApiUrl() {
+            const url = document.getElementById('apiUrl').value.trim();
+            if (!url) {
+                showToast('Please enter a valid URL', 'error');
+                return;
+            }
+            state.apiUrl = url;
+            localStorage.setItem('apiUrl', url);
+            updateSyncStatus(true);
+            showToast('API URL saved successfully', 'success');
+        }
+
+        async function testConnection() {
+            if (!state.apiUrl) {
+                showToast('Please save API URL first', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(state.apiUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'testConnection' })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('Connection successful!', 'success');
+                    updateSyncStatus(true);
+                } else {
+                    showToast('Connection failed: ' + data.message, 'error');
+                    updateSyncStatus(false);
+                }
+            } catch (err) {
+                showToast('Connection error: ' + err.message, 'error');
+                updateSyncStatus(false);
+            }
+        }
+
+        async function syncFromCloud() {
+            if (!state.apiUrl) {
+                showToast('Please configure API URL in settings', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(state.apiUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getTrades' })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    state.trades = data.data;
+                    showToast(`Synced ${state.trades.length} trades`, 'success');
+                    updateDashboard();
+                    updateJournalTable();
+                } else {
+                    showToast('Sync failed: ' + data.message, 'error');
+                }
+            } catch (err) {
+                showToast('Sync error: ' + err.message, 'error');
+            }
+        }
+
+        async function addTradeToCloud(trade) {
+            const res = await fetch(state.apiUrl, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'addTrade', trade })
+            });
+            return await res.json();
+        }
+
+        async function updateTradeInCloud(tradeId, trade) {
+            const res = await fetch(state.apiUrl, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'updateTrade', tradeId, trade })
+            });
+            return await res.json();
+        }
+
+        async function deleteTradeFromCloud(tradeId) {
+            const res = await fetch(state.apiUrl, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'deleteTrade', tradeId })
+            });
+            return await res.json();
+        }
+
+        // Modal
+        function openModal(trade = null) {
+            state.editingTradeId = trade?.id || null;
+            document.getElementById('modalTitle').textContent = trade ? 'Edit Trade' : 'Add Trade';
+            
+            if (trade) {
+                document.getElementById('tradeDate').value = trade.date;
+                document.getElementById('tradeTime').value = trade.time;
+                document.getElementById('tradePair').value = trade.pair;
+                document.getElementById('tradeSession').value = trade.session;
+                document.getElementById('tradeType').value = trade.type;
+                document.getElementById('tradeResult').value = trade.result;
+                document.getElementById('tradeEntry').value = trade.entryPrice;
+                document.getElementById('tradeExit').value = trade.exitPrice;
+                document.getElementById('tradeRisk').value = trade.riskAmount;
+                document.getElementById('tradeReward').value = trade.rewardAmount;
+                document.getElementById('tradeNotes').value = trade.notes;
+            } else {
+                document.getElementById('tradeForm').reset();
+                document.getElementById('tradeDate').value = new Date().toISOString().split('T')[0];
+            }
+            
+            document.getElementById('tradeModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+            state.editingTradeId = null;
+        }
+
+        async function handleSaveTrade(e) {
+            e.preventDefault();
+            
+            if (!state.apiUrl) {
+                showToast('Please configure API URL in settings', 'error');
+                return;
+            }
+
+            const trade = {
+                date: document.getElementById('tradeDate').value,
+                time: document.getElementById('tradeTime').value,
+                pair: document.getElementById('tradePair').value,
+                session: document.getElementById('tradeSession').value,
+                type: document.getElementById('tradeType').value,
+                result: document.getElementById('tradeResult').value,
+                entryPrice: document.getElementById('tradeEntry').
