@@ -795,7 +795,7 @@
                             <tr style="border-bottom: 1px solid var(--border-light);">
                                 <td style="padding: 12px;">${trade.date}</td>
                                 <td style="padding: 12px;"><strong>${trade.pair}</strong></td>
-                                <td style="padding: 12px;">${trade.session === 'european' ? 'london' : trade.session === 'American' ? 'new york' : trade.session}</td>
+                                <td style="padding: 12px;">${trade.session}</td>
                                 <td style="padding: 12px;">
                                     <span style="color: ${trade.result === 'Win' ? 'var(--success)' : 'var(--error)'}; font-weight: 600;">
                                         ${trade.result}
@@ -864,19 +864,4 @@
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.innerHTML = `
-                <span class="material-icons">${type === 'success' ? 'check_circle' : type === 'warning' ? 'warning' : 'error'}</span>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideInRight 0.3s ease reverse';
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
+                <span class="material-icons">${type === 'success' ? 'check
