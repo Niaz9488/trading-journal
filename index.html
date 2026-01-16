@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Multi-User Trading Journal</title>
+    <title>Secure Trading Journal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -20,7 +20,6 @@
             --warning: #F59E0B;
             --profit: #10B981;
             --loss: #EF4444;
-            --neutral: #6B7280;
             --bg-light: #F8FAFC;
             --bg-dark: #1E293B;
             --text-light: #1F2937;
@@ -49,8 +48,8 @@
             padding: 20px;
         }
 
-        .login-container {
-            max-width: 400px;
+        .setup-container, .login-container {
+            max-width: 500px;
             margin: 100px auto;
             padding: 40px;
             background: var(--card-light);
@@ -58,8 +57,25 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
+        body.dark-mode .setup-container,
         body.dark-mode .login-container {
             background: var(--card-dark);
+        }
+
+        .setup-container h1,
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .setup-container p,
+        .login-container p {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.7;
+            font-size: 14px;
         }
 
         .user-avatar {
@@ -73,6 +89,27 @@
             justify-content: center;
             font-size: 32px;
             margin: 0 auto 20px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .status-badge.connected {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
         }
 
         .app-container {
@@ -137,26 +174,6 @@
             align-items: center;
             justify-content: center;
             font-size: 16px;
-        }
-
-        .sync-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .sync-status.connected {
-            background: rgba(52, 211, 153, 0.1);
-            color: var(--success);
-        }
-
-        .sync-status.disconnected {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
         }
 
         nav {
@@ -236,7 +253,6 @@
 
         .btn-success:hover {
             background: #10B981;
-            transform: translateY(-2px);
         }
 
         .btn-warning {
@@ -247,10 +263,6 @@
         .btn-danger {
             background: var(--error);
             color: white;
-        }
-
-        .btn-danger:hover {
-            background: #DC2626;
         }
 
         .btn-secondary {
@@ -565,20 +577,69 @@
     </style>
 </head>
 <body>
+    <!-- Setup Page (First Time) -->
+    <div id="setupPage" class="setup-container">
+        <div class="user-avatar">
+            <span class="material-icons">settings</span>
+        </div>
+        <h1>Welcome to Trading Journal</h1>
+        <p>Please configure your Google Apps Script connection first</p>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span class="status-badge disconnected" id="setupStatus">
+                <span class="material-icons" style="font-size: 16px;">cloud_off</span>
+                <span>Not Connected</span>
+            </span>
+        </div>
+
+        <div class="form-group">
+            <label for="setupScriptUrl">
+                <span class="material-icons" style="vertical-align: middle; font-size: 18px;">link</span>
+                Google Apps Script URL *
+            </label>
+            <input type="url" id="setupScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" required>
+            <small style="font-size: 11px; opacity: 0.7; display: block; margin-top: 4px;">
+                Paste your deployed web app URL here
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label for="setupAdminPassword">
+                <span class="material-icons" style="vertical-align: middle; font-size: 18px;">lock</span>
+                Admin Password (Optional)
+            </label>
+            <input type="password" id="setupAdminPassword" placeholder="For admin features only">
+            <small style="font-size: 11px; opacity: 0.7; display: block; margin-top: 4px;">
+                Only needed if you want admin access
+            </small>
+        </div>
+        
+        <button class="btn btn-warning" id="testSetupBtn" style="width: 100%; margin-bottom: 12px;">
+            <span class="material-icons">sync</span>
+            Test Connection
+        </button>
+
+        <button class="btn btn-success" id="continueSetupBtn" style="width: 100%;" disabled>
+            <span class="material-icons">arrow_forward</span>
+            Continue to Login
+        </button>
+    </div>
+
     <!-- Login Page -->
-    <div id="loginPage" class="login-container">
+    <div id="loginPage" class="login-container" style="display: none;">
         <div class="user-avatar">
             <span class="material-icons">account_circle</span>
         </div>
-        <h1>Trading Journal</h1>
+        <h1>Trading Journal Login</h1>
+        <p>Login or create your account</p>
         
         <div class="form-group">
-            <label for="userEmail">Email</label>
+            <label for="userEmail">Email Address</label>
             <input type="email" id="userEmail" placeholder="your.email@example.com" required>
         </div>
         
         <div class="form-group">
-            <label for="userName">Name</label>
+            <label for="userName">Display Name</label>
             <input type="text" id="userName" placeholder="John Trader" required>
         </div>
         
@@ -587,9 +648,14 @@
             <input type="password" id="userPassword" placeholder="••••••••" required>
         </div>
         
-        <button class="btn btn-primary" style="width: 100%;" id="loginBtn">
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
             <span class="material-icons">login</span>
             Login / Register
+        </button>
+
+        <button class="btn btn-secondary" style="width: 100%;" id="backToSetupBtn">
+            <span class="material-icons">arrow_back</span>
+            Back to Setup
         </button>
     </div>
 
@@ -605,10 +671,6 @@
                     <div class="user-info">
                         <div class="user-avatar-small" id="userAvatarSmall">U</div>
                         <span id="userDisplayName">User</span>
-                    </div>
-                    <div class="sync-status disconnected" id="syncStatus">
-                        <span class="material-icons">cloud_off</span>
-                        <span>Not Connected</span>
                     </div>
                     <button class="btn btn-icon btn-secondary" id="themeToggle">
                         <span class="material-icons">dark_mode</span>
@@ -682,7 +744,7 @@
                 <!-- Journal -->
                 <div id="journal" class="page">
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                             <h2 style="margin: 0;">All Trades</h2>
                             <button class="btn btn-danger" id="deleteAllBtn">
                                 <span class="material-icons">delete_sweep</span>
@@ -695,8 +757,8 @@
 
                 <!-- Users (Admin Only) -->
                 <div id="users" class="page">
-                    <div class="admin-controls" id="adminControls">
-                        <h3>
+                    <div class="admin-controls">
+                        <h3 style="color: var(--warning); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                             <span class="material-icons">admin_panel_settings</span>
                             Admin Controls
                         </h3>
@@ -717,11 +779,11 @@
                     <div class="card">
                         <h2>
                             <span class="material-icons">cloud</span>
-                            Cloud Settings
+                            Connection Settings
                         </h2>
                         <div class="form-group">
                             <label for="scriptUrl">Google Apps Script URL</label>
-                            <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+                            <input type="url" id="scriptUrl" readonly style="background: #f5f5f5;">
                         </div>
                         <div class="form-group">
                             <label for="adminPassword">Admin Password</label>
@@ -729,11 +791,7 @@
                         </div>
                         <button class="btn btn-success" id="saveSettingsBtn">
                             <span class="material-icons">save</span>
-                            Save Settings
-                        </button>
-                        <button class="btn btn-warning" id="testConnectionBtn" style="margin-left: 12px;">
-                            <span class="material-icons">sync</span>
-                            Test Connection
+                            Save Admin Password
                         </button>
                     </div>
 
@@ -742,10 +800,10 @@
                             <span class="material-icons">download</span>
                             Download Your Data
                         </h2>
-                        <p style="margin-bottom: 16px;">Export all your trading data as a CSV file for backup or analysis.</p>
+                        <p style="margin-bottom: 16px;">Export all your trading data as CSV</p>
                         <button class="btn btn-success" id="downloadDataBtn">
                             <span class="material-icons">file_download</span>
-                            Download My Data as CSV
+                            Download My Data
                         </button>
                     </div>
                 </div>
@@ -812,25 +870,25 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="riskAmount">Risk Amount ($)</label>
-                        <input type="number" id="riskAmount" step="0.01" placeholder="100.00">
+                        <label for="riskAmount">Risk ($)</label>
+                        <input type="number" id="riskAmount" step="0.01">
                     </div>
                     <div class="form-group">
-                        <label for="rewardAmount">Reward Amount ($)</label>
-                        <input type="number" id="rewardAmount" step="0.01" placeholder="300.00">
+                        <label for="rewardAmount">Reward ($)</label>
+                        <input type="number" id="rewardAmount" step="0.01">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="tradeNotes">Notes</label>
-                    <textarea id="tradeNotes" rows="4" placeholder="Trade notes..."></textarea>
+                    <textarea id="tradeNotes" rows="4"></textarea>
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
                     <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
                     <button type="submit" class="btn btn-success">
                         <span class="material-icons">save</span>
-                        Save Trade
+                        Save
                     </button>
                 </div>
             </form>
@@ -844,108 +902,28 @@
         let currentEditId = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkLoginStatus();
-            loadSettings();
+            checkSetupStatus();
             initializeEventListeners();
         });
 
-        function checkLoginStatus() {
+        function checkSetupStatus() {
+            const savedUrl = localStorage.getItem('googleScriptUrl');
             const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
+
+            if (!savedUrl) {
+                // Show setup page
+                showSetupPage();
+            } else if (!savedUser) {
+                // URL configured, show login
+                SCRIPT_URL = savedUrl;
+                document.getElementById('setupScriptUrl').value = savedUrl;
+                showLoginPage();
+            } else {
+                // Both configured, show app
+                SCRIPT_URL = savedUrl;
                 currentUser = JSON.parse(savedUser);
                 showApp();
-            } else {
-                showLogin();
             }
         }
 
-        function showLogin() {
-            document.getElementById('loginPage').style.display = 'block';
-            document.getElementById('appContainer').style.display = 'none';
-        }
-
-        function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('appContainer').classList.add('active');
-            
-            updateUserInfo();
-            updateConnectionStatus();
-            loadUserTrades();
-        }
-
-        async function loginUser(email, password, name) {
-            if (!SCRIPT_URL) {
-                showToast('Please configure connection first', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'login',
-                        email: email,
-                        password: password,
-                        name: name
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    currentUser = result.data;
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    showApp();
-                    showToast('Login successful!', 'success');
-                    
-                    if (currentUser.isAdmin) {
-                        document.getElementById('usersTab').style.display = 'flex';
-                    }
-                } else {
-                    showToast('Login failed: ' + result.message, 'error');
-                }
-            } catch (error) {
-                showToast('Login failed: ' + error.message, 'error');
-            }
-        }
-
-        function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
-                currentUser = null;
-                trades = [];
-                localStorage.removeItem('currentUser');
-                showLogin();
-                showToast('Logged out successfully', 'success');
-            }
-        }
-
-        function updateUserInfo() {
-            if (currentUser) {
-                document.getElementById('userDisplayName').textContent = currentUser.name;
-                const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('userAvatarSmall').textContent = initials.slice(0, 2);
-            }
-        }
-
-        function loadSettings() {
-            const savedUrl = localStorage.getItem('googleScriptUrl');
-            if (savedUrl) {
-                document.getElementById('scriptUrl').value = savedUrl;
-                SCRIPT_URL = savedUrl;
-            }
-            
-            const savedPassword = localStorage.getItem('adminPassword');
-            if (savedPassword) {
-                document.getElementById('adminPassword').value = savedPassword;
-            }
-        }
-
-        function saveSettings() {
-            const url = document.getElementById('scriptUrl').value.trim();
-            const adminPassword = document.getElementById('adminPassword').value;
-            
-            if (url) {
-                localStorage.setItem('googleScriptUrl', url);
-                SCRIPT_URL = url;
-                localStorage.setItem
+        function showSetupPage
