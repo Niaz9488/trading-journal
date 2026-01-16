@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Trading Journal</title>
+    <title>Multi-User Trading Journal - Cloud Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -20,6 +20,7 @@
             --warning: #F59E0B;
             --profit: #10B981;
             --loss: #EF4444;
+            --neutral: #6B7280;
             --bg-light: #F8FAFC;
             --bg-dark: #1E293B;
             --text-light: #1F2937;
@@ -48,8 +49,9 @@
             padding: 20px;
         }
 
-        .setup-container, .login-container {
-            max-width: 500px;
+        /* Login Page */
+        .login-container {
+            max-width: 400px;
             margin: 100px auto;
             padding: 40px;
             background: var(--card-light);
@@ -57,25 +59,14 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        body.dark-mode .setup-container,
         body.dark-mode .login-container {
             background: var(--card-dark);
         }
 
-        .setup-container h1,
         .login-container h1 {
             text-align: center;
-            margin-bottom: 10px;
-            color: var(--primary);
-            font-size: 28px;
-        }
-
-        .setup-container p,
-        .login-container p {
-            text-align: center;
             margin-bottom: 30px;
-            opacity: 0.7;
-            font-size: 14px;
+            color: var(--primary);
         }
 
         .user-avatar {
@@ -91,27 +82,7 @@
             margin: 0 auto 20px;
         }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .status-badge.connected {
-            background: rgba(52, 211, 153, 0.1);
-            color: var(--success);
-        }
-
-        .status-badge.disconnected {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
-        }
-
+        /* Main App */
         .app-container {
             display: none;
         }
@@ -120,6 +91,7 @@
             display: block;
         }
 
+        /* Header */
         header {
             background: var(--card-light);
             padding: 20px;
@@ -131,6 +103,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            transition: all 0.3s ease;
         }
 
         body.dark-mode header {
@@ -176,12 +149,38 @@
             font-size: 16px;
         }
 
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .sync-status.connected {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--success);
+        }
+
+        .sync-status.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        .sync-status .material-icons {
+            font-size: 16px;
+        }
+
+        /* Navigation */
         nav {
             background: var(--card-light);
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
 
         body.dark-mode nav {
@@ -222,6 +221,7 @@
             color: white;
         }
 
+        /* Buttons */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -244,6 +244,7 @@
         .btn-primary:hover {
             background: #2563EB;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .btn-success {
@@ -253,6 +254,7 @@
 
         .btn-success:hover {
             background: #10B981;
+            transform: translateY(-2px);
         }
 
         .btn-warning {
@@ -263,6 +265,11 @@
         .btn-danger {
             background: var(--error);
             color: white;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
@@ -285,6 +292,7 @@
             justify-content: center;
         }
 
+        /* Pages */
         .page {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -299,12 +307,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Cards */
         .card {
             background: var(--card-light);
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
         body.dark-mode .card {
@@ -320,6 +330,7 @@
             gap: 8px;
         }
 
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -357,9 +368,19 @@
             font-weight: 700;
         }
 
-        .profit { color: var(--profit); }
-        .loss { color: var(--loss); }
+        .profit {
+            color: var(--profit);
+        }
 
+        .loss {
+            color: var(--loss);
+        }
+
+        .neutral {
+            color: var(--neutral);
+        }
+
+        /* Form */
         .form-group {
             margin-bottom: 20px;
         }
@@ -403,6 +424,7 @@
             gap: 16px;
         }
 
+        /* Table */
         .table-container {
             overflow-x: auto;
             border-radius: 12px;
@@ -430,6 +452,15 @@
             border-bottom: 1px solid var(--border-light);
         }
 
+        body.dark-mode th,
+        body.dark-mode td {
+            border-bottom-color: var(--border-dark);
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
         tbody tr:hover {
             background: rgba(59, 130, 246, 0.05);
         }
@@ -444,6 +475,7 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            transition: all 0.2s ease;
             background: transparent;
             color: var(--text-light);
         }
@@ -456,6 +488,11 @@
             background: var(--border-light);
         }
 
+        body.dark-mode .btn-icon-small:hover {
+            background: var(--border-dark);
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -467,6 +504,7 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal.active {
@@ -481,10 +519,16 @@
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
+            animation: slideUp 0.3s ease;
         }
 
         body.dark-mode .modal-content {
             background: var(--card-dark);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
@@ -494,6 +538,12 @@
             margin-bottom: 24px;
         }
 
+        .modal-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -519,25 +569,20 @@
         .toast.error { background: var(--error); }
         .toast.warning { background: var(--warning); }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state .material-icons {
-            font-size: 80px;
-            opacity: 0.3;
-            margin-bottom: 16px;
-        }
-
-        .admin-controls {
-            background: rgba(245, 158, 11, 0.1);
-            border: 2px solid var(--warning);
-            border-radius: 12px;
+        /* Code Block */
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
             padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 16px 0;
+            white-space: pre;
         }
 
+        /* User Management */
         .user-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -551,10 +596,16 @@
             display: flex;
             align-items: center;
             gap: 16px;
+            transition: all 0.3s ease;
         }
 
         body.dark-mode .user-card {
             background: var(--card-dark);
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
         .user-card-avatar {
@@ -567,71 +618,193 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            flex-shrink: 0;
         }
 
+        .user-card-info {
+            flex: 1;
+        }
+
+        .user-card-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .user-card-email {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .user-card-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .user-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            margin-bottom: 4px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Admin Controls */
+        .admin-controls {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-controls h3 {
+            color: var(--warning);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Performance Indicators */
+        .performance-indicators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .indicator {
+            background: var(--card-light);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .indicator {
+            background: var(--card-dark);
+        }
+
+        .indicator:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .indicator-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            margin: 5px 0;
+        }
+
+        .indicator-label {
+            font-size: 12px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        /* Time Filters */
+        .time-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .time-filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: var(--border-light);
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .time-filter-btn {
+            background: var(--border-dark);
+            color: var(--text-dark);
+        }
+
+        .time-filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .time-filter-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state .material-icons {
+            font-size: 80px;
+            opacity: 0.3;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             h1 { font-size: 20px; }
             .form-row { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr; }
+            .filters { flex-direction: column; }
+            .header-controls { flex-wrap: wrap; width: 100%; }
+            .performance-indicators { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .performance-indicators { grid-template-columns: 1fr; }
+            .user-list { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Setup Page (First Time) -->
-    <div id="setupPage" class="setup-container">
-        <div class="user-avatar">
-            <span class="material-icons">settings</span>
-        </div>
-        <h1>Welcome to Trading Journal</h1>
-        <p>Please configure your Google Apps Script connection first</p>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <span class="status-badge disconnected" id="setupStatus">
-                <span class="material-icons" style="font-size: 16px;">cloud_off</span>
-                <span>Not Connected</span>
-            </span>
-        </div>
-
-        <div class="form-group">
-            <label for="setupScriptUrl">
-                <span class="material-icons" style="vertical-align: middle; font-size: 18px;">link</span>
-                Google Apps Script URL *
-            </label>
-            <input type="url" id="setupScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" required>
-            <small style="font-size: 11px; opacity: 0.7; display: block; margin-top: 4px;">
-                Paste your deployed web app URL here
-            </small>
-        </div>
-        
-        <div class="form-group">
-            <label for="setupAdminPassword">
-                <span class="material-icons" style="vertical-align: middle; font-size: 18px;">lock</span>
-                Admin Password (Optional)
-            </label>
-            <input type="password" id="setupAdminPassword" placeholder="For admin features only">
-            <small style="font-size: 11px; opacity: 0.7; display: block; margin-top: 4px;">
-                Only needed if you want admin access
-            </small>
-        </div>
-        
-        <button class="btn btn-warning" id="testSetupBtn" style="width: 100%; margin-bottom: 12px;">
-            <span class="material-icons">sync</span>
-            Test Connection
-        </button>
-
-        <button class="btn btn-success" id="continueSetupBtn" style="width: 100%;" disabled>
-            <span class="material-icons">arrow_forward</span>
-            Continue to Login
-        </button>
-    </div>
-
     <!-- Login Page -->
-    <div id="loginPage" class="login-container" style="display: none;">
+    <div id="loginPage" class="login-container">
         <div class="user-avatar">
             <span class="material-icons">account_circle</span>
         </div>
-        <h1>Trading Journal Login</h1>
-        <p>Login or create your account</p>
+        <h1>Multi-User Trading Journal</h1>
         
         <div class="form-group">
             <label for="userEmail">Email Address</label>
@@ -652,11 +825,10 @@
             <span class="material-icons">login</span>
             Login / Register
         </button>
-
-        <button class="btn btn-secondary" style="width: 100%;" id="backToSetupBtn">
-            <span class="material-icons">arrow_back</span>
-            Back to Setup
-        </button>
+        
+        <p style="text-align: center; font-size: 12px; opacity: 0.7;">
+            First time users will be automatically registered
+        </p>
     </div>
 
     <!-- Main App -->
@@ -665,12 +837,16 @@
             <header>
                 <h1>
                     <span class="material-icons">analytics</span>
-                    Trading Journal
+                    Multi-User Trading Journal
                 </h1>
                 <div class="header-controls">
-                    <div class="user-info">
+                    <div class="user-info" id="currentUserInfo">
                         <div class="user-avatar-small" id="userAvatarSmall">U</div>
                         <span id="userDisplayName">User</span>
+                    </div>
+                    <div class="sync-status disconnected" id="syncStatus">
+                        <span class="material-icons">cloud_off</span>
+                        <span>Not Connected</span>
                     </div>
                     <button class="btn btn-icon btn-secondary" id="themeToggle">
                         <span class="material-icons">dark_mode</span>
@@ -692,7 +868,15 @@
                         <span class="material-icons">book</span>
                         Journal
                     </button>
-                    <button class="nav-tab" data-page="users" id="usersTab" style="display:none;">
+                    <button class="nav-tab" data-page="analysis">
+                        <span class="material-icons">insights</span>
+                        Analysis
+                    </button>
+                    <button class="nav-tab" data-page="risk">
+                        <span class="material-icons">security</span>
+                        Risk/Reward
+                    </button>
+                    <button class="nav-tab" data-page="users" id="usersTab">
                         <span class="material-icons">group</span>
                         Users
                     </button>
@@ -708,222 +892,95 @@
             </nav>
 
             <main>
-                <!-- Dashboard -->
+                <!-- Dashboard Page -->
                 <div id="dashboard" class="page active">
+                    <div class="time-filters">
+                        <button class="time-filter-btn active" data-period="all">All Time</button>
+                        <button class="time-filter-btn" data-period="today">Today</button>
+                        <button class="time-filter-btn" data-period="week">This Week</button>
+                        <button class="time-filter-btn" data-period="month">This Month</button>
+                        <button class="time-filter-btn" data-period="year">This Year</button>
+                    </div>
+
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-label">Total P/L</div>
+                            <div class="stat-label">Total Profit/Loss</div>
                             <div class="stat-value" id="totalProfitLoss">$0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Risk/Reward Ratio</div>
+                            <div class="stat-value" id="riskRewardRatio">0.00</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">Win Rate</div>
                             <div class="stat-value" id="winRate">0%</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Total Trades</div>
-                            <div class="stat-value" id="totalTrades">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Avg Risk</div>
+                            <div class="stat-label">Average Risk</div>
                             <div class="stat-value" id="averageRisk">$0</div>
                         </div>
                     </div>
 
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                            <h2 style="margin: 0;">Recent Trades</h2>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                            <h2 style="margin: 0;">
+                                <span class="material-icons">bar_chart</span>
+                                Recent Trades
+                            </h2>
                             <button class="btn btn-success" id="syncBtn">
                                 <span class="material-icons">sync</span>
-                                Sync
+                                Sync from Cloud
                             </button>
                         </div>
                         <div id="recentTradesContainer"></div>
                     </div>
                 </div>
 
-                <!-- Journal -->
+                <!-- Journal Page -->
                 <div id="journal" class="page">
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                            <h2 style="margin: 0;">All Trades</h2>
-                            <button class="btn btn-danger" id="deleteAllBtn">
-                                <span class="material-icons">delete_sweep</span>
-                                Delete All
+                        <h2>
+                            <span class="material-icons">filter_list</span>
+                            Filters
+                        </h2>
+                        <div class="filters">
+                            <div class="filter-group">
+                                <label>Search</label>
+                                <input type="text" id="searchFilter" placeholder="Search by pair or notes...">
+                            </div>
+                            <div class="filter-group">
+                                <label>Session</label>
+                                <select id="sessionFilter">
+                                    <option value="">All Sessions</option>
+                                    <option value="Asian">Asian</option>
+                                    <option value="European">European</option>
+                                    <option value="American">American</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Result</label>
+                                <select id="resultFilter">
+                                    <option value="">All Results</option>
+                                    <option value="Win">Win</option>
+                                    <option value="Loss">Loss</option>
+                                    <option value="Breakeven">Breakeven</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Date Range</label>
+                                <input type="date" id="dateFromFilter">
+                                <input type="date" id="dateToFilter" style="margin-top: 4px;">
+                            </div>
+                            <button class="btn btn-secondary" id="clearFilters">
+                                <span class="material-icons">clear</span>
+                                Clear All
                             </button>
                         </div>
-                        <div id="journalTableContainer"></div>
-                    </div>
-                </div>
-
-                <!-- Users (Admin Only) -->
-                <div id="users" class="page">
-                    <div class="admin-controls">
-                        <h3 style="color: var(--warning); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                            <span class="material-icons">admin_panel_settings</span>
-                            Admin Controls
-                        </h3>
-                        <button class="btn btn-danger" id="deleteAllUsersDataBtn">
-                            <span class="material-icons">delete_forever</span>
-                            Delete All Users Data
-                        </button>
                     </div>
 
                     <div class="card">
-                        <h2>Registered Users</h2>
-                        <div id="usersListContainer"></div>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div id="settings" class="page">
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">cloud</span>
-                            Connection Settings
-                        </h2>
-                        <div class="form-group">
-                            <label for="scriptUrl">Google Apps Script URL</label>
-                            <input type="url" id="scriptUrl" readonly style="background: #f5f5f5;">
-                        </div>
-                        <div class="form-group">
-                            <label for="adminPassword">Admin Password</label>
-                            <input type="password" id="adminPassword" placeholder="For admin features">
-                        </div>
-                        <button class="btn btn-success" id="saveSettingsBtn">
-                            <span class="material-icons">save</span>
-                            Save Admin Password
-                        </button>
-                    </div>
-
-                    <div class="card">
-                        <h2>
-                            <span class="material-icons">download</span>
-                            Download Your Data
-                        </h2>
-                        <p style="margin-bottom: 16px;">Export all your trading data as CSV</p>
-                        <button class="btn btn-success" id="downloadDataBtn">
-                            <span class="material-icons">file_download</span>
-                            Download My Data
-                        </button>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- Trade Modal -->
-    <div id="tradeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Add New Trade</h3>
-                <button class="btn-icon-small" id="closeModal">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-            <form id="tradeForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="tradeDate">Date *</label>
-                        <input type="date" id="tradeDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tradeTime">Time *</label>
-                        <input type="time" id="tradeTime" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="tradePair">Pair *</label>
-                        <input type="text" id="tradePair" placeholder="EUR/USD" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tradeSession">Session *</label>
-                        <select id="tradeSession" required>
-                            <option value="">Select</option>
-                            <option value="Asian">Asian</option>
-                            <option value="European">European</option>
-                            <option value="American">American</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="tradeType">Type *</label>
-                        <select id="tradeType" required>
-                            <option value="">Select</option>
-                            <option value="Buy">Buy</option>
-                            <option value="Sell">Sell</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tradeResult">Result *</label>
-                        <select id="tradeResult" required>
-                            <option value="">Select</option>
-                            <option value="Win">Win</option>
-                            <option value="Loss">Loss</option>
-                            <option value="Breakeven">Breakeven</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="riskAmount">Risk ($)</label>
-                        <input type="number" id="riskAmount" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label for="rewardAmount">Reward ($)</label>
-                        <input type="number" id="rewardAmount" step="0.01">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="tradeNotes">Notes</label>
-                    <textarea id="tradeNotes" rows="4"></textarea>
-                </div>
-
-                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn btn-success">
-                        <span class="material-icons">save</span>
-                        Save
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        let SCRIPT_URL = localStorage.getItem('googleScriptUrl') || '';
-        let currentUser = null;
-        let trades = [];
-        let currentEditId = null;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            checkSetupStatus();
-            initializeEventListeners();
-        });
-
-        function checkSetupStatus() {
-            const savedUrl = localStorage.getItem('googleScriptUrl');
-            const savedUser = localStorage.getItem('currentUser');
-
-            if (!savedUrl) {
-                // Show setup page
-                showSetupPage();
-            } else if (!savedUser) {
-                // URL configured, show login
-                SCRIPT_URL = savedUrl;
-                document.getElementById('setupScriptUrl').value = savedUrl;
-                showLoginPage();
-            } else {
-                // Both configured, show app
-                SCRIPT_URL = savedUrl;
-                currentUser = JSON.parse(savedUser);
-                showApp();
-            }
-        }
-
-        function showSetupPage
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                            <h2 style="margin: 0;">
+                                <span class="material-icons">table_chart</span>
+                                All Trades
+                                <span style="font-size: 14px
