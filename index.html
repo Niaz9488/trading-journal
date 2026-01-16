@@ -1,583 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal - Cloud Sync</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        /* All your CSS styles from before - keep them exactly as they were */
-        /* ... [PASTE ALL YOUR EXISTING CSS HERE] ... */
-    </style>
-</head>
-<body>
-    <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="user-avatar">
-            <span class="material-icons">account_circle</span>
-        </div>
-        <h1>Trading Journal</h1>
+// Add this to your HTML file's JavaScript section
+
+// Add download button to the settings page HTML:
+/*
+<div class="card">
+    <h2>
+        <span class="material-icons">download</span>
+        Download Your Data
+    </h2>
+    <p>Export all your trading data as a CSV file for backup or analysis.</p>
+    <button class="btn btn-success" id="downloadDataBtn">
+        <span class="material-icons">file_download</span>
+        Download My Data as CSV
+    </button>
+</div>
+*/
+
+// Add this function to download user data
+async function downloadUserData() {
+    if (!currentUser || !SCRIPT_URL) {
+        showToast('Please login and configure connection first', 'error');
+        return;
+    }
+
+    try {
+        showToast('Preparing your data...', 'warning');
         
-        <div class="form-group">
-            <label for="userEmail">Email Address</label>
-            <input type="email" id="userEmail" placeholder="trader@example.com">
-        </div>
-        
-        <div class="form-group">
-            <label for="userName">Your Name</label>
-            <input type="text" id="userName" placeholder="John Trader">
-        </div>
-        
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
-            <span class="material-icons">login</span>
-            Start Journal
-        </button>
-        
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="btn btn-secondary" id="offlineModeBtn" style="width: 100%;">
-                <span class="material-icons">computer</span>
-                Use Offline Mode
-            </button>
-        </div>
-    </div>
-
-    <!-- Cloud Setup -->
-    <div id="cloudSetupModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Cloud Sync Setup</h3>
-                <button class="btn-icon" id="closeCloudSetup">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-            
-            <div class="form-group">
-                <label>Google Apps Script URL</label>
-                <input type="url" id="gasWebAppUrl" 
-                       placeholder="https://script.google.com/macros/s/.../exec">
-                <p style="font-size: 12px; color: #666; margin-top: 5px;">
-                    Leave empty to use offline mode
-                </p>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                <button class="btn btn-primary" id="saveCloudConfig">
-                    <span class="material-icons">save</span>
-                    Connect
-                </button>
-                <button class="btn btn-secondary" id="skipCloudSetup">
-                    <span class="material-icons">skip_next</span>
-                    Skip (Offline)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main App -->
-    <div id="appContainer" class="app-container">
-        <div class="container">
-            <header>
-                <h1>
-                    <span class="material-icons">analytics</span>
-                    Trading Journal
-                </h1>
-                <div class="header-controls">
-                    <div class="user-info" id="currentUserInfo">
-                        <div class="user-avatar-small" id="userAvatarSmall">T</div>
-                        <span id="userDisplayName">Trader</span>
-                    </div>
-                    <div class="sync-status" id="syncStatus">
-                        <span class="material-icons">computer</span>
-                        <span>Offline</span>
-                    </div>
-                    <button class="btn btn-primary" id="addTradeBtn">
-                        <span class="material-icons">add</span>
-                        Add Trade
-                    </button>
-                </div>
-            </header>
-
-            <!-- Navigation and pages remain the same -->
-            <!-- ... [KEEP ALL YOUR EXISTING APP HTML] ... -->
-            
-        </div>
-    </div>
-
-    <!-- Trade Modal -->
-    <div id="tradeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Add Trade</h3>
-                <button class="btn-icon" id="closeModal">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-            
-            <form id="tradeForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Currency Pair *</label>
-                        <input type="text" id="currencyPair" placeholder="EUR/USD" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Type *</label>
-                        <select id="tradeType" required>
-                            <option value="">Select</option>
-                            <option value="Buy">Buy</option>
-                            <option value="Sell">Sell</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Entry Price *</label>
-                        <input type="number" id="entryPrice" step="0.00001" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Exit Price *</label>
-                        <input type="number" id="exitPrice" step="0.00001" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Position Size *</label>
-                    <input type="number" id="positionSize" step="0.01" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Session</label>
-                        <select id="session">
-                            <option value="">Select</option>
-                            <option value="Asian">Asian</option>
-                            <option value="European">European</option>
-                            <option value="American">American</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Date & Time *</label>
-                        <input type="datetime-local" id="tradeDateTime" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Notes</label>
-                    <textarea id="tradeNotes" rows="3" placeholder="Trade notes..."></textarea>
-                </div>
-
-                <div style="display: flex; gap: 12px; margin-top: 24px;">
-                    <button type="submit" class="btn btn-primary" id="saveTradeBtn">
-                        <span class="material-icons">save</span>
-                        Save Trade
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="cancelTradeBtn">
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toastContainer"></div>
-
-    <script>
-        // ========== CONFIGURATION ==========
-        let currentUser = null;
-        let trades = [];
-        let cloudConfig = {
-            enabled: false,
-            gasUrl: '',
-            useDemo: false
-        };
-        
-        // ========== INITIALIZATION ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set default datetime
-            document.getElementById('tradeDateTime').value = getCurrentDateTime();
-            
-            // Load saved user
-            const savedUser = localStorage.getItem('tradingUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showApp();
-                loadTrades();
-            }
-            
-            // Event Listeners
-            document.getElementById('loginBtn').addEventListener('click', handleLogin);
-            document.getElementById('offlineModeBtn').addEventListener('click', handleOffline);
-            document.getElementById('addTradeBtn').addEventListener('click', () => openTradeModal());
-            document.getElementById('closeModal').addEventListener('click', closeTradeModal);
-            document.getElementById('cancelTradeBtn').addEventListener('click', closeTradeModal);
-            document.getElementById('tradeForm').addEventListener('submit', saveTrade);
-            document.getElementById('saveCloudConfig').addEventListener('click', saveCloudConfig);
-            document.getElementById('skipCloudSetup').addEventListener('click', skipCloudSetup);
-            document.getElementById('closeCloudSetup').addEventListener('click', closeCloudSetup);
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'downloadUserData',
+                userId: currentUser.userId
+            })
         });
         
-        // ========== CORE FUNCTIONS ==========
+        const result = await response.json();
         
-        function handleLogin() {
-            const email = document.getElementById('userEmail').value.trim();
-            const name = document.getElementById('userName').value.trim();
+        if (result.success) {
+            // Create download link
+            const blob = new Blob([result.data.csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = result.data.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
             
-            if (!email || !name) {
-                showToast('Please enter email and name', 'error');
-                return;
-            }
-            
-            currentUser = {
-                id: generateUserId(email),
-                email: email,
-                name: name,
-                avatar: name.charAt(0).toUpperCase(),
-                createdAt: new Date().toISOString()
-            };
-            
-            localStorage.setItem('tradingUser', JSON.stringify(currentUser));
-            showCloudSetup();
+            showToast('Data downloaded successfully!', 'success');
+        } else {
+            showToast('Download failed: ' + result.message, 'error');
         }
+    } catch (error) {
+        showToast('Download failed: ' + error.message, 'error');
+    }
+}
+
+// Update the initializeEventListeners function to add this:
+// document.getElementById('downloadDataBtn').addEventListener('click', downloadUserData);
+
+// Update getAllUsers to require admin password
+async function loadAllUsers() {
+    if (!SCRIPT_URL) {
+        showToast('Please configure Google Sheets connection first', 'error');
+        return;
+    }
+
+    const adminPassword = localStorage.getItem('adminPassword');
+    if (!adminPassword) {
+        showToast('Please set admin password in settings first', 'error');
+        navigateToPage('settings');
+        return;
+    }
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ 
+                action: 'getAllUsers',
+                adminPassword: adminPassword
+            })
+        });
         
-        function handleOffline() {
-            currentUser = {
-                id: 'offline_' + Date.now(),
-                email: 'offline@trading.com',
-                name: 'Offline Trader',
-                avatar: 'O',
-                createdAt: new Date().toISOString()
-            };
-            
-            localStorage.setItem('tradingUser', JSON.stringify(currentUser));
-            cloudConfig.enabled = false;
-            showApp();
-            loadTrades();
-            showToast('Offline mode activated', 'success');
+        const result = await response.json();
+        
+        if (result.success) {
+            const users = result.data || [];
+            localStorage.setItem('allUsers', JSON.stringify(users));
+            renderUsersList(users);
+        } else {
+            showToast('Failed to load users: ' + result.message, 'error');
         }
-        
-        function showCloudSetup() {
-            document.getElementById('cloudSetupModal').classList.add('active');
-        }
-        
-        function closeCloudSetup() {
-            document.getElementById('cloudSetupModal').classList.remove('active');
-        }
-        
-        function saveCloudConfig() {
-            const url = document.getElementById('gasWebAppUrl').value.trim();
-            
-            if (url) {
-                cloudConfig = {
-                    enabled: true,
-                    gasUrl: url,
-                    useDemo: false
-                };
-                testCloudConnection();
-            } else {
-                skipCloudSetup();
-            }
-        }
-        
-        function skipCloudSetup() {
-            cloudConfig.enabled = false;
-            showApp();
-            loadTrades();
-            showToast('Using offline mode', 'warning');
-        }
-        
-        async function testCloudConnection() {
-            const url = cloudConfig.gasUrl;
-            showToast('Testing connection...', 'warning');
-            
-            try {
-                // Test ping
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({action: 'ping'})
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Register user
-                    const registerResponse = await fetch(url, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            action: 'register',
-                            user: currentUser
-                        })
-                    });
-                    
-                    const registerData = await registerResponse.json();
-                    
-                    if (registerData.success) {
-                        localStorage.setItem('cloudConfig', JSON.stringify(cloudConfig));
-                        showApp();
-                        loadTrades();
-                        showToast('Cloud connected successfully!', 'success');
-                    } else {
-                        throw new Error(registerData.error || 'Registration failed');
-                    }
-                } else {
-                    throw new Error(data.error || 'Connection failed');
-                }
-            } catch (error) {
-                showToast(`Connection failed: ${error.message}`, 'error');
-                cloudConfig.enabled = false;
-            }
-        }
-        
-        function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('appContainer').classList.add('active');
-            document.getElementById('cloudSetupModal').classList.remove('active');
-            
-            // Update user info
-            if (currentUser) {
-                document.getElementById('userDisplayName').textContent = currentUser.name;
-                document.getElementById('userAvatarSmall').textContent = currentUser.avatar;
-                
-                // Update sync status
-                const syncStatus = document.getElementById('syncStatus');
-                if (cloudConfig.enabled) {
-                    syncStatus.className = 'sync-status connected';
-                    syncStatus.innerHTML = '<span class="material-icons">cloud_done</span><span>Cloud Connected</span>';
-                } else {
-                    syncStatus.className = 'sync-status';
-                    syncStatus.innerHTML = '<span class="material-icons">computer</span><span>Offline</span>';
-                }
-            }
-        }
-        
-        // ========== TRADE FUNCTIONS ==========
-        
-        function openTradeModal(trade = null) {
-            const modal = document.getElementById('tradeModal');
-            const title = document.getElementById('modalTitle');
-            
-            if (trade) {
-                title.textContent = 'Edit Trade';
-                // Fill form with trade data
-                document.getElementById('currencyPair').value = trade.pair || '';
-                document.getElementById('tradeType').value = trade.type || '';
-                document.getElementById('entryPrice').value = trade.entry || '';
-                document.getElementById('exitPrice').value = trade.exit || '';
-                document.getElementById('positionSize').value = trade.size || '';
-                document.getElementById('session').value = trade.session || '';
-                document.getElementById('tradeDateTime').value = trade.dateTime || getCurrentDateTime();
-                document.getElementById('tradeNotes').value = trade.notes || '';
-            } else {
-                title.textContent = 'Add Trade';
-                document.getElementById('tradeForm').reset();
-                document.getElementById('tradeDateTime').value = getCurrentDateTime();
-            }
-            
-            modal.classList.add('active');
-        }
-        
-        function closeTradeModal() {
-            document.getElementById('tradeModal').classList.remove('active');
-            document.getElementById('tradeForm').reset();
-        }
-        
-        async function saveTrade(e) {
-            e.preventDefault();
-            
-            const trade = {
-                id: 'trade_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                pair: document.getElementById('currencyPair').value,
-                type: document.getElementById('tradeType').value,
-                entry: parseFloat(document.getElementById('entryPrice').value),
-                exit: parseFloat(document.getElementById('exitPrice').value),
-                size: parseFloat(document.getElementById('positionSize').value),
-                session: document.getElementById('session').value,
-                dateTime: document.getElementById('tradeDateTime').value,
-                notes: document.getElementById('tradeNotes').value,
-                userId: currentUser.id,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            
-            // Calculate profit/loss
-            const isBuy = trade.type === 'Buy';
-            const pips = (trade.exit - trade.entry) * (isBuy ? 1 : -1);
-            trade.profitLoss = pips * trade.size;
-            trade.result = trade.profitLoss > 0 ? 'Win' : trade.profitLoss < 0 ? 'Loss' : 'Break-even';
-            
-            // Add to trades array
-            trades.unshift(trade);
-            
-            // Save locally
-            saveTradesLocal();
-            
-            // Save to cloud if enabled
-            if (cloudConfig.enabled) {
-                await saveTradesCloud();
-            }
-            
-            closeTradeModal();
-            updateDashboard();
-            showToast('Trade saved successfully!', 'success');
-        }
-        
-        // ========== DATA MANAGEMENT ==========
-        
-        function loadTrades() {
-            // Load from localStorage
-            const savedTrades = localStorage.getItem(`trades_${currentUser.id}`);
-            if (savedTrades) {
-                trades = JSON.parse(savedTrades);
-            }
-            
-            updateDashboard();
-        }
-        
-        function saveTradesLocal() {
-            localStorage.setItem(`trades_${currentUser.id}`, JSON.stringify(trades));
-        }
-        
-        async function saveTradesCloud() {
-            if (!cloudConfig.enabled || !cloudConfig.gasUrl) return;
-            
-            try {
-                const response = await fetch(cloudConfig.gasUrl, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        action: 'saveTrades',
-                        user: currentUser,
-                        trades: trades
-                    })
-                });
-                
-                const data = await response.json();
-                if (!data.success) {
-                    console.error('Cloud save failed:', data.error);
-                }
-            } catch (error) {
-                console.error('Cloud save error:', error);
-            }
-        }
-        
-        // ========== UI FUNCTIONS ==========
-        
-        function updateDashboard() {
-            if (trades.length === 0) {
-                document.getElementById('recentTradesContainer').innerHTML = 
-                    '<p style="text-align: center; padding: 20px; color: #666;">No trades yet. Add your first trade!</p>';
-                return;
-            }
-            
-            // Calculate stats
-            const totalPL = trades.reduce((sum, t) => sum + t.profitLoss, 0);
-            const wins = trades.filter(t => t.result === 'Win').length;
-            const winRate = trades.length > 0 ? (wins / trades.length * 100).toFixed(1) : 0;
-            
-            // Update stats
-            document.getElementById('totalProfitLoss').textContent = `$${totalPL.toFixed(2)}`;
-            document.getElementById('totalProfitLoss').className = `stat-value ${totalPL >= 0 ? 'profit' : 'loss'}`;
-            document.getElementById('winRate').textContent = `${winRate}%`;
-            
-            // Show recent trades
-            const recent = trades.slice(0, 5);
-            const html = `
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Pair</th>
-                                <th>Type</th>
-                                <th>P/L</th>
-                                <th>Result</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${recent.map(trade => `
-                                <tr>
-                                    <td>${formatDate(trade.dateTime)}</td>
-                                    <td><strong>${trade.pair}</strong></td>
-                                    <td>${trade.type}</td>
-                                    <td class="${trade.profitLoss >= 0 ? 'profit' : 'loss'}">
-                                        ${trade.profitLoss >= 0 ? '+' : ''}$${trade.profitLoss.toFixed(2)}
-                                    </td>
-                                    <td>
-                                        <span class="result-badge ${trade.result.toLowerCase()}">
-                                            ${trade.result}
-                                        </span>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            document.getElementById('recentTradesContainer').innerHTML = html;
-        }
-        
-        // ========== UTILITY FUNCTIONS ==========
-        
-        function generateUserId(email) {
-            return 'user_' + btoa(email).replace(/[^a-z0-9]/gi, '').substr(0, 12);
-        }
-        
-        function getCurrentDateTime() {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            return now.toISOString().slice(0, 16);
-        }
-        
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <span class="material-icons">
-                    ${type === 'success' ? 'check_circle' : 
-                      type === 'error' ? 'error' : 
-                      type === 'warning' ? 'warning' : 'info'}
-                </span>
-                ${message}
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideInRight 0.3s ease reverse';
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
-        }
-        
-        // Add CSS for result badges
-        const style = document.createElement('style');
-        style.textContent = `
-            .result-badge {
-                padding: 4px 8px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 500;
-                display: inline-block;
-            }
-            .result-badge.win { background: rgba(16, 185, 129, 0.2); color: #10B981; }
-            .result-badge.loss { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
-            .result-badge.break-even { background: rgba(107, 114, 128, 0.2); color: #6B7280; }
-        `;
-        document.head.appendChild(style);
-    </script>
-</body>
-</html>
+    } catch (error) {
+        showToast('Failed to load users: ' + error.message, 'error');
+    }
+}
